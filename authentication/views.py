@@ -4,15 +4,15 @@ from django.http import HttpResponse
 
 # Create your views here.
 def home(request):
-    return HttpResponse("hello")
+    return render(request, 'home.html')
 
 
 def signup(request):
-    return render(request, "authentication/signup.html")
+    return render(request, "register.html")
 
 
 def signin(request):
-    return render(request, "authentication/signin.html")
+    return render(request, "login.html")
 
 
 def signout(request):

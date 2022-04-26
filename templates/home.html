@@ -1,19 +1,40 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Plagiarism</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/login-full-page-bs4.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login-full-page-bs4.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
-<body class="d-flex justify-content-center align-items-center align-content-center justify-content-sm-between justify-content-md-between justify-content-lg-between justify-content-xl-between justify-content-xxl-center" style="color: rgb(0,0,0);background: url(&quot;https://miro.medium.com/max/1400/0*IepNUIT3oQoGzAb1.jpg&quot;) center / cover no-repeat;height: 796px;"><button class="btn btn-primary" type="button" style="margin: 55px;margin-top: 0;margin-left: 0;width: 111.4062px;min-height: 50px;min-width: 43px;padding: 8px 12px;padding-left: 39px;padding-right: 55px;">Button</button><button class="btn btn-primary" type="button" style="margin: 55px;margin-top: 0;margin-left: 0;width: 111.4062px;background: var(--bs-gray-200);color: var(--bs-blue);min-height: 50px;min-width: 43px;padding: 8px 12px;padding-left: 39px;padding-right: 55px;margin-right: 0px;text-align: center;">Button</button>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/login-full-page-bs4.js"></script>
-    <script src="assets/js/login-full-page-bs4-1.js"></script>
+<body class="d-flex justify-content-center align-items-center align-content-center
+ justify-content-sm-between justify-content-md-between
+  justify-content-lg-between justify-content-xl-between justify-content-xxl-center"
+      style="color: rgb(0,0,0);
+      background: url(https://miro.medium.com/max/1400/0*IepNUIT3oQoGzAb1.jpg)
+       center / cover no-repeat;height: 796px;">
+<div style="background-color:#fff; padding: 60px; border-radius: 15px; margin-top: -40px">
+    <a class="btn btn-primary btn-outline-white text-white" href="{% url 'signin' %}"
+       style="margin: 0 55px 55px 0;
+        width: 111px;min-height: 50px;min-width: 43px;
+        padding: 8px 55px 8px 39px;">
+        Login
+    </a>
+    <a class="btn btn-light btn-outline-primary text-primary" href="{% url 'signup' %}"
+       style="width: 111px;
+        min-height: 50px;min-width: 43px;padding: 8px 55px 8px 39px;
+        margin: 0 0 55px 0;text-align: center;">
+        Logout
+    </a>
+    <p class="h2 fw-bold align-content-center"> THE PLAGIARISM SYSTEM</p>
+</div>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/login-full-page-bs4.js' %}"></script>
+<script src="{% static 'js/login-full-page-bs4-1.js' %}"></script>
 </body>
 
 </html>
