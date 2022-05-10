@@ -12,5 +12,5 @@ urlpatterns = [
     path('about-us', views.about, name="about-us"),
     path('contact-us', views.contact, name="contact-us"),
     path('upload', views.upload, name="upload"),
-    path('token', views.token, name="token"),
+    # path('token', views.token, name="token"),
 ]

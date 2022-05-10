@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 
 # Create your views here.
 def home(request):
-    date = datetime.now().year 
+    date = datetime.now().year
     context = {
         "date": date,
     }
@@ -29,7 +29,7 @@ def signup(request):
 def signin(request):
     username = request.POST.get("username")
     password = request.POST.get("password")
-    user_login = authenticate(username = username, password=password)
+    user_login = authenticate(username=username, password=password)
     if user_login is not None:
         return redirect('/home')
 
@@ -41,17 +41,23 @@ def signout(request):
 
 
 def welcome(request):
-
     context = {
         'username': 'yokwejuste'
     }
     return render(request, 'homepages/index.html', context)
 
+
 def feature(request):
     return render(request, 'homepages/features.html')
+
+
 def about(request):
     return render(request, 'homepages/about-us.html')
+
+
 def contact(request):
-    return render(request, 'homepages/contact-us.html')  
+    return render(request, 'homepages/contact-us.html')
+
+
 def upload(request):
-    return render(request, 'homepages/upload.html')      
+    return render(request, 'homepages/upload.html')
