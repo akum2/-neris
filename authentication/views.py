@@ -1,5 +1,5 @@
 from datetime import datetime
-from django import views
+from .models import *
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -41,7 +41,6 @@ def signout(request):
 
 
 def welcome(request):
-
     context = {
         'username': 'yokwejuste'
     }
@@ -54,4 +53,17 @@ def about(request):
 def contact(request):
     return render(request, 'homepages/contact-us.html')  
 def upload(request):
-    return render(request, 'homepages/upload.html')      
+    return render(request, 'homepages/upload.html')   
+
+
+def upload_doc(request):
+    if request.method == "POST":
+        document_title = request.POST.get("document_title")
+        author = request.POST.get("author")
+        document = request.POST.get("document_content")
+        document_content = document.split()
+        form = Check(document_title=document_title, author=author, document_content=document_content)
+        form.save()
+        return HttpResponse(f"<h1>{author} Hurray! Good Job for the project {document_title}</h1>")
+
+    return render(request, "upload_doc.html")
