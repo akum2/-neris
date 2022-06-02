@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-qb&(8=2z$yix@okus-^oogid&legpm#okuy!h6#no@a4-^4x%!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'https://pl4g.herokuapp.com',
+    'https://www.pl4g.herokuapp.com',
+    'pl4g.herokuapp.com',
+]
 
 # Application definition
 
