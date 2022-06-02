@@ -6,7 +6,6 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
-
 # Create your views here.
 from plagiarism.settings import BASE_DIR
 
@@ -65,75 +64,65 @@ def contact(request):
 
 def upload(request):
     if request.POST:
-        universalSetOfUniqueWords = []
-        matchPercentage = 0
+        universal_set_of_unique_words = []
 
-        ####################################################################################################
+        input_query = request.POST.get("query")
+        print(input_query)
 
-        inputQuery = request.POST.get("query")
-        print(inputQuery)
+        lowercase_query = open(input_query, "r").read().lower()
+        print(lowercase_query)
 
-        lowercaseQuery = open(inputQuery, "r").read().lower()
-        print(lowercaseQuery)
-        # lowercaseQuery = inputQuery.lower()
+        query_word_list = re.sub("[\w]", " ", lowercase_query).split()
 
-        queryWordList = re.sub("[^\w]", " ", lowercaseQuery).split()  # Replace punctuation by space and split
-        # queryWordList = map(str, queryWordList)					#This was causing divide by zero error
-
-        for word in queryWordList:
-            if word not in universalSetOfUniqueWords:
-                universalSetOfUniqueWords.append(word)
-
-        ####################################################################################################
+        for word in query_word_list:
+            if word not in universal_set_of_unique_words:
+                universal_set_of_unique_words.append(word)
 
         fd = open(os.path.join(BASE_DIR, "database1.txt"), "r")
         database1 = fd.read().lower()
 
-        databaseWordList = re.sub("[^\w]", " ", database1).split()  # Replace punctuation by space and split
-        # databaseWordList = map(str, databaseWordList)			#And this also leads to divide by zero error
+        database_word_list = re.sub("[\w]", " ", database1).split()
 
-        for word in databaseWordList:
-            if word not in universalSetOfUniqueWords:
-                universalSetOfUniqueWords.append(word)
+        for word in database_word_list:
+            if word not in universal_set_of_unique_words:
+                universal_set_of_unique_words.append(word)
 
-        ####################################################################################################
+        query_tf = []
+        database_tf = []
 
-        queryTF = []
-        databaseTF = []
+        for word in universal_set_of_unique_words:
+            query_tf_counter = 0
+            database_tf_counter = 0
 
-        for word in universalSetOfUniqueWords:
-            queryTfCounter = 0
-            databaseTfCounter = 0
-
-            for word2 in queryWordList:
+            for word2 in query_word_list:
                 if word == word2:
-                    queryTfCounter += 1
-            queryTF.append(queryTfCounter)
+                    query_tf_counter += 1
+            query_tf.append(query_tf_counter)
 
-            for word2 in databaseWordList:
+            for word2 in database_word_list:
                 if word == word2:
-                    databaseTfCounter += 1
-            databaseTF.append(databaseTfCounter)
+                    database_tf_counter += 1
+            database_tf.append(database_tf_counter)
 
-        dotProduct = 0
-        for i in range(len(queryTF)):
-            dotProduct += queryTF[i] * databaseTF[i]
+        dot_product = 0
+        for i in range(len(query_tf)):
+            dot_product += query_tf[i] * database_tf[i]
 
-        queryVectorMagnitude = 0
-        for i in range(len(queryTF)):
-            queryVectorMagnitude += queryTF[i] ** 2
-        queryVectorMagnitude = math.sqrt(queryVectorMagnitude)
+        query_vector_magnitude = 0
+        for i in range(len(query_tf)):
+            query_vector_magnitude += query_tf[i] ** 2
+        query_vector_magnitude = math.sqrt(query_vector_magnitude)
 
-        databaseVectorMagnitude = 0
-        for i in range(len(databaseTF)):
-            databaseVectorMagnitude += databaseTF[i] ** 2
-        databaseVectorMagnitude = math.sqrt(databaseVectorMagnitude)
+        database_vector_magnitude = 0
+        for i in range(len(database_tf)):
+            database_vector_magnitude += database_tf[i] ** 2
+        database_vector_magnitude = math.sqrt(database_vector_magnitude)
 
-        matchPercentage = (float)(dotProduct / (queryVectorMagnitude * databaseVectorMagnitude)) * 100
-        output = "Input query text matches %0.02f%% with database." % matchPercentage
+        match_percentage = float(dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
+        output = "Input query text matches %0.02f%% with database." % match_percentage
         context = {
             'output': output,
-            'query': inputQuery,
+            'query': input_query,
         }
         return render(request, 'homepages/upload.html', context)
     else:
