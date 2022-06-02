@@ -6,7 +6,9 @@ cachetools==5.0.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
 dill==0.3.4
+dj-database-url==0.5.0
 Django==4.0.4
+django-heroku==0.3.1
 flatbuffers==2.0
 gast==0.5.3
 google-auth==2.6.6
@@ -15,11 +17,14 @@ google-pasta==0.2.0
 grpcio==1.44.0
 h5py==3.6.0
 idna==3.3
+importlib-metadata==4.11.3
+insultgenerator==1.0.3
 isort==5.10.1
 keras==2.8.0
 Keras-Preprocessing==1.1.2
 lazy-object-proxy==1.7.1
 libclang==14.0.1
+loremipsum==1.0.5
 Markdown==3.3.6
 mccabe==0.7.0
 numpy==1.22.3
@@ -28,6 +33,7 @@ opt-einsum==3.3.0
 Pillow==9.1.0
 platformdirs==2.5.2
 protobuf==3.20.1
+psycopg2==2.9.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pylint==2.13.7
@@ -43,4 +49,7 @@ tomli==2.0.1
 typing_extensions==4.2.0
 urllib3==1.26.9
 Werkzeug==2.1.1
+White-Noise==0.1.0
+whitenoise==6.1.0
 wrapt==1.14.0
+zipp==3.8.0
