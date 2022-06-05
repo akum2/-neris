@@ -67,8 +67,8 @@ class TheUsers(AbstractBaseUser):
     )
     profile = models.ImageField(
         verbose_name='Picture',
-        upload_to=f'profiles/{str(username).replace(" ", "-").replace("  ", "-")}/',
-        default='profile2.png',
+        upload_to=f'profiles/%Y/',
+        default='profiles/unknown_user.png',
         null=False
     )
     last_login = models.DateTimeField(
