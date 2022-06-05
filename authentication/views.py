@@ -6,7 +6,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login
 
 # Create your views here.
 from authentication.forms import *
@@ -30,7 +30,10 @@ def signup(request):
 
 
 def signin(request):
-    context = {}
+    context = {
+        'title': 'signin',
+        'active_s': 'active'
+    }
     # request.session.set_expiry(datetime.day)
     if request.POST:
         form = UserLoginForm(request.POST)
@@ -51,32 +54,42 @@ def signin(request):
     return render(request, 'login.html', context)
 
 
-def signout(request):
-    logout(request)
-    return redirect('/logout')
-
-
 @login_required(login_url='/signin')
 def welcome(request):
     context = {
-        'username': 'yokwejuste'
+        'title': 'Home',
+        'active_w': 'active'
     }
     return render(request, 'homepages/index.html', context)
 
 
 @login_required(login_url='/signin')
 def feature(request):
-    return render(request, 'homepages/features.html')
+    context = {
+        'title': 'Feature',
+        'active_f': 'active'
+    }
+    return render(request, 'homepages/features.html', context)
 
 
 @login_required(login_url='/signin')
 def about(request):
-    return render(request, 'homepages/about-us.html')
+    user_data = TheUsers.objects.filter(is_admin=True)
+    context = {
+        'title': 'About',
+        'active_a': 'active',
+        'user_data': user_data,
+    }
+    return render(request, 'homepages/about-us.html', context)
 
 
 @login_required(login_url='/signin')
 def contact(request):
-    return render(request, 'homepages/contact-us.html')
+    context = {
+        'title': 'Contact',
+        'active_c': 'active'
+    }
+    return render(request, 'homepages/contact-us.html', context)
 
 
 @login_required(login_url='/signin')
@@ -126,10 +139,37 @@ def upload(request):
             'output': output,
             'val': math.ceil(match_percentage),
             'query': input_query,
+            'title': 'Upload'
         }
         return render(request, 'homepages/upload.html', context)
     else:
         context = {
             'val': 'nothing',
+            'title': 'Upload',
+            'active': 'active'
         }
     return render(request, 'homepages/upload.html', context)
+
+
+@login_required
+def profile(request):
+    context = {
+        'title': 'Profile',
+        'active': 'active'
+    }
+    return render(request, 'homepages/profile.html', context)
+
+
+@login_required
+def profile_edit(request):
+    if request.POST:
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        update_user = TheUsers(name=name, email=email, phone=phone)
+        messages.success(request, "Profile successfully updated")
+    context = {
+        'title': 'Profile Edit',
+        'active': 'active'
+    }
+    return render(request, 'homepages/profile-edit.html', context)
