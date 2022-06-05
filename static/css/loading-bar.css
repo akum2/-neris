@@ -16,3 +16,7 @@
 .ldBar.no-percent .ldBar-label:after {
   content: "";
 }
+
+input.upload:active{
+  background-color: red;
+}

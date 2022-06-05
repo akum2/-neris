@@ -3,6 +3,8 @@ import os
 import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.contrib import messages
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -18,6 +20,7 @@ ALLOWED_HOSTS = [
     'https://pl4g.herokuapp.com',
     'https://www.pl4g.herokuapp.com',
     'pl4g.herokuapp.com',
+    '127.0.0.1'
 ]
 
 # Application definition
@@ -121,3 +124,16 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login SYSTEM
+LOGIN_URL = 'signin'
+LOGIN_REDIRECT_URL = 'signin'
+AUTH_USER_MODEL = 'authentication.TheUsers'
+
+MESSAGE_TAGS = {
+        messages.DEBUG: 'alert-secondary',
+        messages.INFO: 'alert-info',
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+ }

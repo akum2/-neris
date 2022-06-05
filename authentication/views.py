@@ -2,11 +2,14 @@ import math
 import os
 import re
 from datetime import datetime
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
+from authentication.forms import *
 from plagiarism.settings import BASE_DIR
 
 
@@ -19,30 +22,41 @@ def home(request):
 
 
 def signup(request):
-    # full_name = request.POST.get("name")
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    email = request.POST.get("email")
-    if request.POST:
-        User.objects.create_user(username, email, password)
-        return redirect('signin')
-    return render(request, "register.html")
+    form = UserRegistrationForm()
+    context = {
+        "form": form,
+    }
+    return render(request, "register.html", context)
 
 
 def signin(request):
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    user_login = authenticate(username=username, password=password)
-    if user_login is not None:
-        return redirect('/home')
-
-    return render(request, "login.html")
+    context = {}
+    # request.session.set_expiry(datetime.day)
+    if request.POST:
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            user_name = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(
+                request,
+                username=user_name,
+                password=password
+            )
+            if user is not None:
+                login(request, user)
+                return redirect('welcome')
+    else:
+        form = UserLoginForm()
+        context['login_form'] = form
+    return render(request, 'login.html', context)
 
 
 def signout(request):
-    pass
+    logout(request)
+    return redirect('/logout')
 
 
+@login_required(login_url='/signin')
 def welcome(request):
     context = {
         'username': 'yokwejuste'
@@ -50,18 +64,22 @@ def welcome(request):
     return render(request, 'homepages/index.html', context)
 
 
+@login_required(login_url='/signin')
 def feature(request):
     return render(request, 'homepages/features.html')
 
 
+@login_required(login_url='/signin')
 def about(request):
     return render(request, 'homepages/about-us.html')
 
 
+@login_required(login_url='/signin')
 def contact(request):
     return render(request, 'homepages/contact-us.html')
 
 
+@login_required(login_url='/signin')
 def upload(request):
     if request.POST:
         universal_set_of_unique_words = []
@@ -103,6 +121,7 @@ def upload(request):
         database_vector_magnitude = math.sqrt(database_vector_magnitude)
         match_percentage = float(dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
         output = "Input query text matches %0.02f%% with database." % match_percentage
+        messages.success(request, "Your query has been processed.")
         context = {
             'output': output,
             'val': math.ceil(match_percentage),
@@ -111,6 +130,6 @@ def upload(request):
         return render(request, 'homepages/upload.html', context)
     else:
         context = {
-            'val': 'nothing'
+            'val': 'nothing',
         }
     return render(request, 'homepages/upload.html', context)
