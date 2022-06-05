@@ -28,11 +28,11 @@ def signup(request):
         if form.is_valid():
             form.save()
             return redirect('signin')
-        context[['register_form']] = form
+        context[['form']] = form
 
     else:
-        form = UserRegistrationForm
-        context['register_form'] = form
+        form = UserRegistrationForm()
+        context['form'] = form
     return render(request, "register.html", context)
 
 
