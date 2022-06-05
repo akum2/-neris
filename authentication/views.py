@@ -22,10 +22,17 @@ def home(request):
 
 
 def signup(request):
-    form = UserRegistrationForm()
-    context = {
-        "form": form,
-    }
+    context = {}
+    if request.POST:
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+        context[['register_form']] = form
+
+    else:
+        form = UserRegistrationForm
+        context['register_form'] = form
     return render(request, "register.html", context)
 
 
