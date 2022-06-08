@@ -45,9 +45,9 @@ six>=1.16.0
 sqlparse>=0.4.2
 tensorflow-io-gcs-filesystem>=0.26.0
 termcolor>=1.1.0
-tf-estimator-nightly==2.10.0.dev2022060608
-tomli==2.0.1
-typing_extensions==4.2.0
+tf-estimator-nightly>=2.10.0.dev2022060608
+tomli>=2.0.1
+typing_extensions>=4.2.0
 urllib3==1.26.9
 Werkzeug==2.1.2
 White-Noise==0.1.0
