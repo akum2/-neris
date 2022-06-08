@@ -48,9 +48,9 @@ termcolor>=1.1.0
 tf-estimator-nightly>=2.10.0.dev2022060608
 tomli>=2.0.1
 typing_extensions>=4.2.0
-urllib3==1.26.9
-Werkzeug==2.1.2
-White-Noise==0.1.0
+urllib3>=1.26.9
+Werkzeug>=2.1.2
+White-Noise>=0.1.0
 whitenoise==6.2.0
 wrapt==1.14.1
 zipp==3.8.0
