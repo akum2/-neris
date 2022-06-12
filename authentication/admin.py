@@ -5,3 +5,4 @@ from authentication.models import *
 
 admin.site.register(Try)
 admin.site.register(Check)
+admin.site.register(TheUsers)

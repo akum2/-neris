@@ -2,11 +2,14 @@ import math
 import os
 import re
 from datetime import datetime
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import login
 
 # Create your views here.
+from authentication.forms import *
 from plagiarism.settings import BASE_DIR
 
 
@@ -19,49 +22,84 @@ def home(request):
 
 
 def signup(request):
-    # full_name = request.POST.get("name")
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    email = request.POST.get("email")
+    context = {}
     if request.POST:
-        User.objects.create_user(username, email, password)
-        return redirect('signin')
-    return render(request, "register.html")
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('signin')
+        context['form'] = form
+
+    else:
+        form = UserRegistrationForm()
+        context['form'] = form
+    return render(request, "register.html", context)
 
 
 def signin(request):
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    user_login = authenticate(username=username, password=password)
-    if user_login is not None:
-        return redirect('/home')
+    context = {
+        'title': 'signin',
+        'active_s': 'active'
+    }
+    # request.session.set_expiry(datetime.day)
+    if request.POST:
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            user_name = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(
+                request,
+                username=user_name,
+                password=password
+            )
+            if user is not None:
+                login(request, user)
+                return redirect('welcome')
+    else:
+        form = UserLoginForm()
+        context['login_form'] = form
+    return render(request, 'login.html', context)
 
-    return render(request, "login.html")
 
-
-def signout(request):
-    pass
-
-
+@login_required(login_url='/signin')
 def welcome(request):
     context = {
-        'username': 'yokwejuste'
+        'title': 'Home',
+        'active_w': 'active'
     }
     return render(request, 'homepages/index.html', context)
 
 
+@login_required(login_url='/signin')
 def feature(request):
-    return render(request, 'homepages/features.html')
+    context = {
+        'title': 'Feature',
+        'active_f': 'active'
+    }
+    return render(request, 'homepages/features.html', context)
 
 
+@login_required(login_url='/signin')
 def about(request):
-    return render(request, 'homepages/about-us.html')
+    user_data = TheUsers.objects.filter(is_admin=True)
+    context = {
+        'title': 'About',
+        'active_a': 'active',
+        'user_data': user_data,
+    }
+    return render(request, 'homepages/about-us.html', context)
 
 
+@login_required(login_url='/signin')
 def contact(request):
-    return render(request, 'homepages/contact-us.html')
+    context = {
+        'title': 'Contact',
+        'active_c': 'active'
+    }
+    return render(request, 'homepages/contact-us.html', context)
 
 
+@login_required(login_url='/signin')
 def upload(request):
     if request.POST:
         universal_set_of_unique_words = []
@@ -103,14 +141,47 @@ def upload(request):
         database_vector_magnitude = math.sqrt(database_vector_magnitude)
         match_percentage = float(dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
         output = "Input query text matches %0.02f%% with database." % match_percentage
+        messages.success(request, "Your query has been processed.")
         context = {
             'output': output,
             'val': math.ceil(match_percentage),
             'query': input_query,
+            'title': 'Upload'
         }
         return render(request, 'homepages/upload.html', context)
     else:
         context = {
-            'val': 'nothing'
+            'val': 'nothing',
+            'title': 'Upload',
+            'active': 'active'
         }
     return render(request, 'homepages/upload.html', context)
+
+
+@login_required
+def profile(request):
+    context = {
+        'title': 'Profile',
+        'active': 'active'
+    }
+    return render(request, 'homepages/profile.html', context)
+
+
+@login_required
+def profile_edit(request):
+    if not request.user.is_authenticated:
+        return redirect("sigin")
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile successfully updated")
+            return redirect('profile')
+    else:
+        form = UpdateUserForm(instance=request.user)
+        context = {
+            'title': 'Profile Edit',
+            'active': 'active',
+            'form': form
+        }
+        return render(request, 'homepages/profile-edit.html', context)

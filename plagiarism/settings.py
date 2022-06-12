@@ -1,23 +1,30 @@
 from pathlib import Path
 import os
 import django_heroku
+import environ as django_environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.contrib import messages
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+env = django_environ.Env()
+django_environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qb&(8=2z$yix@okus-^oogid&legpm#okuy!h6#no@a4-^4x%!'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     'https://pl4g.herokuapp.com',
     'https://www.pl4g.herokuapp.com',
     'pl4g.herokuapp.com',
+    '127.0.0.1',
+    'localhost',
 ]
 
 # Application definition
@@ -43,6 +50,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+django_heroku.settings(locals())
 
 ROOT_URLCONF = 'plagiarism.urls'
 
@@ -71,8 +80,12 @@ WSGI_APPLICATION = 'plagiarism.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': env('DB_ENGINE'),
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PORT': env('DB_PORT'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
     }
 }
 
@@ -99,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Douala'
 
 USE_I18N = True
 
@@ -121,3 +134,20 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login SYSTEM
+LOGIN_URL = 'signin'
+LOGIN_REDIRECT_URL = 'signin'
+AUTH_USER_MODEL = 'authentication.TheUsers'
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-secondary',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+LOGOUT_REDIRECT_URL = 'signin'
