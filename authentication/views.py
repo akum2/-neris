@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime
 
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.contrib.auth import login
@@ -59,6 +59,10 @@ def signin(request):
         form = UserLoginForm()
         context['login_form'] = form
     return render(request, 'login.html', context)
+
+def logout(request):
+    auth.logout(request)
+    return redirect('home')
 
 
 @login_required(login_url='/signin')
