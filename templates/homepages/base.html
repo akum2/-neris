@@ -17,6 +17,17 @@
     <link rel="stylesheet" href="{% static 'assets/css/vanilla-zoom.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/loading-bar.css' %}">
     <link rel="stylesheet" href="{% static 'dist/themes/toasteur-default.min.css' %}">
+	<noscript>
+		<link rel="stylesheet" type="text/css" href="{% static 'css/light.css' %}">
+	</noscript>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108356992-4"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	  gtag('config', 'UA-108356992-4');
+	</script>
 </head>
 
 <body>
@@ -119,23 +130,42 @@
         <p>© 2022 Copyright Text</p>
     </div>
 </footer>
+<script src="{% static 'dist/darkmode.min.js' %}"></script>
 <script>
-    /*const body = document.getElementsByTagName('body')[0];
-    body.onload = () => new Toasteur().success("This is a success message, Click me!", 'Success!', () => {
-        new Toasteur("top-left").error("This is an error message, Click me!", 'Error!', () => {
-            new Toasteur("bottom-left").info("This is an info message, Click me!", 'Info!', () => {
-                new Toasteur("bottom-right").warn("This is a warning message, Click me!", 'Warning!')
-            })
-        })
-    });*/
+        var options = {
+          light: "{% static 'css/light.css' %}",
+          dark: "{% static 'css/dark.css' %},
+          startAt: "23:00",
+          endAt: "06:00",
+          checkSystemScheme: true,
+          saveOnToggle: true
+        };
+        var DarkMode = new DarkMode(options);
 </script>
 {% if messages %}
     <ul class="messages">
         {% for message in messages %}
+            {% if message.tags == 'alert-success'%}
             <script>
                 const body = document.getElementsByTagName('body')[0];
                 body.onload = () => new Toasteur().success('{{ message }}');
             </script>
+            {% elif message.tags == 'alert-danger' %}
+            <script>
+                const body = document.getElementsByTagName('body')[0];
+                body.onload = () => new Toasteur().error('{{ message }}');
+            </script>
+            {% elif message.tags == 'alert-warning' %}
+            <script>
+                const body = document.getElementsByTagName('body')[0];
+                body.onload = () => new Toasteur().warn('{{ message }}');
+            </script>
+            {% elif message.tags == 'alert-info' %}
+            <script>
+                const body = document.getElementsByTagName('body')[0];
+                body.onload = () => new Toasteur().info('{{ message }}');
+            </script>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endif %}
