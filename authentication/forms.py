@@ -1,3 +1,4 @@
+import profile
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -50,3 +51,18 @@ class UserRegistrationForm(UserCreationForm):
             'email': forms.TextInput(attrs={'class': 'form-control form-control-user'}),
             'phone': forms.TextInput(attrs={'class': 'form-control form-control-user'}),
         }
+
+
+class UpdateUserForm(forms.ModelForm):
+    name = forms.CharField(max_length=100,
+                               required=True,
+                               widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True,
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone = forms.EmailField(required=True,
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
+    profile = forms.ImageField(required=False,)
+
+    class Meta:
+        model = TheUsers
+        fields = ['name', 'email', 'phone']
