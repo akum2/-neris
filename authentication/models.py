@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from PIL import Image
 
 
 class TheUserManager(BaseUserManager):
@@ -59,7 +60,7 @@ class TheUsers(AbstractBaseUser):
     )
     phone = models.CharField(
         verbose_name="Phone Number",
-        max_length=20, null=False
+        max_length=20, null=True
     )
     date_joined = models.DateTimeField(
         verbose_name='Created On',
@@ -69,7 +70,7 @@ class TheUsers(AbstractBaseUser):
         verbose_name='Picture',
         upload_to=f'profiles/%Y/',
         default='profiles/unknown_user.png',
-        null=False
+        null=True,
     )
     last_login = models.DateTimeField(
         verbose_name='Last login',
@@ -89,6 +90,37 @@ class TheUsers(AbstractBaseUser):
         return self.username
 
     objects = TheUserManager()
+
+    def save(self, *args, **kwargs):
+        super().save()
+        img = Image.open(self.profile.path)
+        width, height = img.size  # Get dimensions
+
+        if width > 300 and height > 300:
+            # keep ratio but shrink down
+            img.thumbnail((width, height))
+
+        # check which one is smaller
+        if height < width:
+            # make square by cutting off equal amounts left and right
+            left = (width - height) / 2
+            right = (width + height) / 2
+            top = 0
+            bottom = height
+            img = img.crop((left, top, right, bottom))
+
+        elif width < height:
+            # make square by cutting off bottom
+            left = 0
+            right = width
+            top = 0
+            bottom = width
+            img = img.crop((left, top, right, bottom))
+
+        if width > 300 and height > 300:
+            img.thumbnail((300, 300))
+
+        img.save(self.profile.path)
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
