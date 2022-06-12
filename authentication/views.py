@@ -169,14 +169,19 @@ def profile(request):
 
 @login_required
 def profile_edit(request):
-    if request.POST:
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        update_user = TheUsers(name=name, email=email, phone=phone)
-        messages.success(request, "Profile successfully updated")
-    context = {
-        'title': 'Profile Edit',
-        'active': 'active'
-    }
-    return render(request, 'homepages/profile-edit.html', context)
+    if not request.user.is_authenticated:
+        return redirect("sigin")
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile successfully updated")
+            return redirect('profile')
+    else:
+        form = UpdateUserForm(instance=request.user)
+        context = {
+            'title': 'Profile Edit',
+            'active': 'active',
+            'form': form
+        }
+        return render(request, 'homepages/profile-edit.html', context)
