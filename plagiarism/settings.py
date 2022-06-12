@@ -51,6 +51,8 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+django_heroku.settings(locals())
+
 ROOT_URLCONF = 'plagiarism.urls'
 
 TEMPLATES = [
