@@ -28,7 +28,20 @@
                 <div class="login-form">
                     <form method="POST" action={% url 'signin' %}>
                         {% csrf_token %}
-                        {{ login_form }}
+                        <label for="username" class="text-capitalize">
+                            {{ login_form.username.label}}
+                        </label>
+                        {{ login_form.username}}
+                        <label for="username" class="text-capitalize">
+                            {{ login_form.password.label}}
+                        </label>
+                        {{ login_form.password}}
+                    {% for error in login_form.errors %}
+                        <p class="text-danger">{{ error }}</p>
+                    {% endfor %}
+                    {% if login_form.non_field_errors %}
+                        <p class="text-danger">{{ login_form.non_field_errors }}</p>
+                    {% endif %}
                         <button class="btn btn-primary d-block w-100" type="submit">
                             Sign In
                         </button>
