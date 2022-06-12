@@ -3,6 +3,18 @@
 {% block content %}
     <main class="page mt-lg-5">
         <div class="container">
+        {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <div id="form_errors">
+                    {% for key, value in form.errors.items %}
+                        <strong>{{ value }}</strong>
+                    {% endfor %}
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
             <div class="main-body">
                 <div class="row">
                     <div class="col-lg-4">
@@ -23,40 +35,31 @@
                     </div>
                     <div class="col-lg-8">
                         <div class="card">
-                            <form method="post" action="{% url 'profile-edit' %}">
+                            <form method="post">
                                 {% csrf_token %}
                                 <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-sm-3">
-                                            <h6 class="mb-0">Full Name</h6>
+                                            <h6 class="mb-0">{{ form.name.label }}</h6>
                                         </div>
                                         <div class="col-sm-9 text-secondary">
-                                            <label>
-                                                <input type="text" name="name" class="form-control text-capitalize"
-                                                       value="{{ user.name }}">
-                                            </label>
+                                            {{ form.name }}
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-sm-3">
-                                            <h6 class="mb-0">Email</h6>
+                                            <h6 class="mb-0">{{ form.email.label }}</h6>
                                         </div>
                                         <div class="col-sm-9 text-secondary">
-                                            <label>
-                                                <input type="text" name="email" class="form-control"
-                                                       value="{{ user.email }}">
-                                            </label>
+                                            {{ form.email }}
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-sm-3">
-                                            <h6 class="mb-0">Phone</h6>
+                                            <h6 class="mb-0">{{ form.phone.label }}</h6>
                                         </div>
                                         <div class="col-sm-9 text-secondary">
-                                            <label>
-                                                <input type="text" name="phone"
-                                                       class="form-control" value="{{ user.phone }}">
-                                            </label>
+                                            {{ form.phone }}
                                         </div>
                                     </div>
                                     <div class="row">
