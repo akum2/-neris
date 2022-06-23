@@ -20,9 +20,9 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
-    'https://pl4g.herokuapp.com',
-    'https://www.pl4g.herokuapp.com',
-    'pl4g.herokuapp.com',
+    'https://uba-plagio.herokuapp.com/',
+    'https://www.uba-plagio.herokuapp.com/',
+    'uba-plagio.herokuapp.com/',
     '127.0.0.1',
     'localhost',
 ]
