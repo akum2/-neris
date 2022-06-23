@@ -93,7 +93,7 @@ class TheUsers(AbstractBaseUser):
 
     def save(self, *args, **kwargs):
         super().save()
-        img = Image.open(self.profile.path)
+        img = Image.open(self.profile.name)
         width, height = img.size  # Get dimensions
 
         if width > 300 and height > 300:
@@ -120,7 +120,7 @@ class TheUsers(AbstractBaseUser):
         if width > 300 and height > 300:
             img.thumbnail((300, 300))
 
-        img.save(self.profile.path)
+        img.save(self.profile.name)
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
