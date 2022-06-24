@@ -133,9 +133,10 @@ AWS_LOCATION = 'static'
 AWS_STORAGE_BUCKET_NAME = 'plagio-store'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.eu-west-3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-AWS_DEFAULT_ACL = 'public-read-write'
+AWS_DEFAULT_ACL = None
 AWS_S3_FILE_OVERWRITE = True
 DEFAULT_FILE_STORAGE = 'authentication.storage_backends.MediaStorage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 
 # Login SYSTEM
@@ -151,6 +152,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 AWS_LOCATION_MEDIA = 'media'
-MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION_MEDIA)
 MEDIA_ROOT = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION_MEDIA)
+PUBLIC_MEDIA_LOCATION = 'media'
+MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION_MEDIA)
+
 LOGOUT_REDIRECT_URL = 'signin'

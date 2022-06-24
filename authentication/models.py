@@ -2,6 +2,9 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from PIL import Image
+from io import StringIO
+from urllib.request import urlopen
+
 
 
 class TheUserManager(BaseUserManager):
@@ -69,7 +72,7 @@ class TheUsers(AbstractBaseUser):
     profile = models.ImageField(
         verbose_name='Picture',
         upload_to=f'profiles/%Y/',
-        default='profiles/unknown_user.png',
+        default = "profiles/unknown_user.png",
         null=True,
     )
     last_login = models.DateTimeField(
@@ -91,36 +94,41 @@ class TheUsers(AbstractBaseUser):
 
     objects = TheUserManager()
 
+
     def save(self, *args, **kwargs):
-        super().save()
-        img = Image.open(self.profile.name)
-        width, height = img.size  # Get dimensions
+        if self.profile.name == "profiles/unknown_user.png":
+            super().save()
+            img = Image.open(self.profile.name)
+            width, height = img.size  # Get dimensions
 
-        if width > 300 and height > 300:
-            # keep ratio but shrink down
-            img.thumbnail((width, height))
+            if width > 300 and height > 300:
+                # keep ratio but shrink down
+                img.thumbnail((width, height))
 
-        # check which one is smaller
-        if height < width:
-            # make square by cutting off equal amounts left and right
-            left = (width - height) / 2
-            right = (width + height) / 2
-            top = 0
-            bottom = height
-            img = img.crop((left, top, right, bottom))
+            # check which one is smaller
+            if height < width:
+                # make square by cutting off equal amounts left and right
+                left = (width - height) / 2
+                right = (width + height) / 2
+                top = 0
+                bottom = height
+                img = img.crop((left, top, right, bottom))
 
-        elif width < height:
-            # make square by cutting off bottom
-            left = 0
-            right = width
-            top = 0
-            bottom = width
-            img = img.crop((left, top, right, bottom))
+            elif width < height:
+                # make square by cutting off bottom
+                left = 0
+                right = width
+                top = 0
+                bottom = width
+                img = img.crop((left, top, right, bottom))
 
-        if width > 300 and height > 300:
-            img.thumbnail((300, 300))
+            if width > 300 and height > 300:
+                img.thumbnail((300, 300))
 
-        img.save(self.profile.name)
+            img.save(self.profile.name)
+        else:
+            super().save()
+
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

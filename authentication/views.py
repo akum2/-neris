@@ -42,22 +42,26 @@ def signin(request):
         'active_s': 'active'
     }
     # request.session.set_expiry(datetime.day)
-    if request.POST:
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            user_name = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(
-                request,
-                username=user_name,
-                password=password
-            )
-            if user is not None:
-                login(request, user)
-                return redirect('welcome')
+    if request.user.is_authenticated:
+        return redirect('welcome')
     else:
-        form = UserLoginForm()
-        context['login_form'] = form
+        if request.POST:
+            form = UserLoginForm(request.POST)
+            if form.is_valid():
+                user_name = request.POST['username']
+                password = request.POST['password']
+                user = authenticate(
+                    request,
+                    username=user_name,
+                    password=password
+                )
+                if user is not None:
+                    login(request, user)
+                    return redirect('welcome')
+        else:
+            form = UserLoginForm()
+            context['login_form'] = form
+        return render(request, 'login.html', context)
     return render(request, 'login.html', context)
 
 def logout(request):
