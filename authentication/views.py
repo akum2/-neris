@@ -9,6 +9,8 @@ from authentication.forms import *
 
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('welcome')
     date = datetime.now().year
     context = {
         "date": date,
@@ -18,16 +20,20 @@ def home(request):
 
 def signup(request):
     context = {}
-    if request.POST:
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('signin')
-        context['form'] = form
-
+    if request.user.is_authenticated:
+        return redirect('welcome')
     else:
-        form = UserRegistrationForm()
-        context['form'] = form
+        if request.POST:
+            form = UserRegistrationForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('signin')
+            context['form'] = form
+
+        else:
+            form = UserRegistrationForm()
+            context['form'] = form
+            return render(request, "register.html", context)
     return render(request, "register.html", context)
 
 
