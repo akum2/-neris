@@ -1,4 +1,3 @@
-from PIL import Image
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -91,49 +90,60 @@ class TheUsers(AbstractBaseUser):
 
     objects = TheUserManager()
 
+
+"""
     def save(self, *args, **kwargs):
-        if self.profile.name == "profiles/unknown_user.png":
-            super().save()
-            img = Image.open(self.profile.name)
-            width, height = img.size  # Get dimensions
+        super().save()
+        img_link = urllib.request.urlretrieve(
+            'https://media.geeksforgeeks.org/wp-content/uploads/20210318103632/gfg-300x300.png',
+            "gfg.png")
+        img = Image.open(img_link)
+        width, height = img.size  # Get dimensions
 
-            if width > 300 and height > 300:
-                # keep ratio but shrink down
-                img.thumbnail((width, height))
+        if width > 300 and height > 300:
+            # keep ratio but shrink down
+            img.thumbnail((width, height))
 
-            # check which one is smaller
-            if height < width:
-                # make square by cutting off equal amounts left and right
-                left = (width - height) / 2
-                right = (width + height) / 2
-                top = 0
-                bottom = height
-                img = img.crop((left, top, right, bottom))
+        # check which one is smaller
+        if height < width:
+            # make square by cutting off equal amounts left and right
+            left = (width - height) / 2
+            right = (width + height) / 2
+            top = 0
+            bottom = height
+            img = img.crop(
+                (
+                    int(left), int(top),
+                    int(right), int(bottom)
+                )
+            )
 
-            elif width < height:
-                # make square by cutting off bottom
-                left = 0
-                right = width
-                top = 0
-                bottom = width
-                img = img.crop((left, top, right, bottom))
+        elif width < height:
+            # make square by cutting off bottom
+            left = 0
+            right = width
+            top = 0
+            bottom = width
+            img = img.crop((left, top, right, bottom))
 
-            if width > 300 and height > 300:
-                img.thumbnail((300, 300))
+        if width > 300 and height > 300:
+            img.thumbnail((300, 300))
 
-            img.save(self.profile.name)
-        else:
-            super().save()
+        img.save(self.profile.name)
+"""
 
-    def has_perm(self, perm, obj=None):
-        return self.is_superuser
 
-    def has_module_perms(self, app_label):
-        return self.is_superuser
+def has_perm(self, perm, obj=None):
+    return self.is_superuser
 
-    class Meta:
-        verbose_name = "User"
-        verbose_name_plural = 'Users'
+
+def has_module_perms(self, app_label):
+    return self.is_superuser
+
+
+class Meta:
+    verbose_name = "User"
+    verbose_name_plural = 'Users'
 
 
 class UploadedDocuments(models.Model):
