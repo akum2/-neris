@@ -2,7 +2,7 @@ name: 'Upstream Sync'
 
 on:
   schedule:
-    - cron:  '* * * * *
+    - cron:  '* * * * *'
     # scheduled to run every minute
   push:
     branches:
