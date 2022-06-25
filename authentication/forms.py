@@ -1,10 +1,9 @@
-import profile
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 
-from authentication.models import TheUsers
+from authentication.models import TheUsers, UploadedDocuments
 
 
 class UserLoginForm(ModelForm):
@@ -55,14 +54,20 @@ class UserRegistrationForm(UserCreationForm):
 
 class UpdateUserForm(forms.ModelForm):
     name = forms.CharField(max_length=100,
-                               required=True,
-                               widget=forms.TextInput(attrs={'class': 'form-control'}))
+                           required=True,
+                           widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(required=True,
                              widget=forms.TextInput(attrs={'class': 'form-control'}))
     phone = forms.EmailField(required=True,
                              widget=forms.TextInput(attrs={'class': 'form-control'}))
-    profile = forms.ImageField(required=False,)
+    profile = forms.ImageField(required=False, )
 
     class Meta:
         model = TheUsers
         fields = ['name', 'email', 'phone']
+
+
+class UploadedDocumentsForm(forms.ModelForm):
+    class Meta:
+        model = UploadedDocuments
+        fields = "__all__"
