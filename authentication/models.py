@@ -1,10 +1,7 @@
+from PIL import Image
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from PIL import Image
-from io import StringIO
-from urllib.request import urlopen
-
 
 
 class TheUserManager(BaseUserManager):
@@ -72,7 +69,7 @@ class TheUsers(AbstractBaseUser):
     profile = models.ImageField(
         verbose_name='Picture',
         upload_to=f'profiles/%Y/',
-        default = "profiles/unknown_user.png",
+        default="profiles/unknown_user.png",
         null=True,
     )
     last_login = models.DateTimeField(
@@ -94,41 +91,39 @@ class TheUsers(AbstractBaseUser):
 
     objects = TheUserManager()
 
+    # def save(self, *args, **kwargs):
+    #     if self.profile.name == "profiles/unknown_user.png":
+    #         super().save()
+    #         img = Image.open(self.profile.name)
+    #         width, height = img.size  # Get dimensions
 
-    def save(self, *args, **kwargs):
-        if self.profile.name == "profiles/unknown_user.png":
-            super().save()
-            img = Image.open(self.profile.name)
-            width, height = img.size  # Get dimensions
+    #         if width > 300 and height > 300:
+    #             # keep ratio but shrink down
+    #             img.thumbnail((width, height))
 
-            if width > 300 and height > 300:
-                # keep ratio but shrink down
-                img.thumbnail((width, height))
+    #         # check which one is smaller
+    #         if height < width:
+    #             # make square by cutting off equal amounts left and right
+    #             left = (width - height) / 2
+    #             right = (width + height) / 2
+    #             top = 0
+    #             bottom = height
+    #             img = img.crop((left, top, right, bottom))
 
-            # check which one is smaller
-            if height < width:
-                # make square by cutting off equal amounts left and right
-                left = (width - height) / 2
-                right = (width + height) / 2
-                top = 0
-                bottom = height
-                img = img.crop((left, top, right, bottom))
+    #         elif width < height:
+    #             # make square by cutting off bottom
+    #             left = 0
+    #             right = width
+    #             top = 0
+    #             bottom = width
+    #             img = img.crop((left, top, right, bottom))
 
-            elif width < height:
-                # make square by cutting off bottom
-                left = 0
-                right = width
-                top = 0
-                bottom = width
-                img = img.crop((left, top, right, bottom))
+    #         if width > 300 and height > 300:
+    #             img.thumbnail((300, 300))
 
-            if width > 300 and height > 300:
-                img.thumbnail((300, 300))
-
-            img.save(self.profile.name)
-        else:
-            super().save()
-
+    #         img.save(self.profile.name)
+    #     else:
+    #         super().save()
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser
@@ -141,20 +136,27 @@ class TheUsers(AbstractBaseUser):
         verbose_name_plural = 'Users'
 
 
-class Try(models.Model):
-    name = models.CharField(max_length=25)
-    phone = models.CharField(max_length=30)
-
-    class Meta:
-        verbose_name = 'Try'
-        verbose_name_plural = 'Tries'
-
-
-class Check(models.Model):
-    added_on = models.DateTimeField(auto_now=True, verbose_name="Added Date")
-    document_title = models.CharField(max_length=75, verbose_name="Document Title")
-    author = models.CharField(verbose_name="Author", max_length=30)
-    document_content = models.CharField(max_length=12000, unique=False, verbose_name="Document Content")
+class UploadedDocuments(models.Model):
+    user = models.ForeignKey(
+        TheUsers,
+        on_delete=models.CASCADE,
+        related_name='documents'
+    )
+    document = models.FileField(
+        verbose_name='Document',
+        upload_to=f'documents/%Y/',
+        null=True,
+    )
+    plagiarism_status = models.CharField(max_length=100, null=True)
+    serialised_content = models.CharField(null=True, max_length=255)
+    date_uploaded = models.DateTimeField(
+        verbose_name='Uploaded On',
+        auto_now_add=True
+    )
 
     def __str__(self):
-        return self.document_title
+        return self.document.name
+
+    class Meta:
+        verbose_name = "Document"
+        verbose_name_plural = 'Documents'
