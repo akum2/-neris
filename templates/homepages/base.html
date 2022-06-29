@@ -8,174 +8,164 @@
     <title>Plagio | {{ title }}</title>
     <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
+        href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
     <link rel="stylesheet" href="{% static 'assets/css/Drag--Drop-Upload-Form.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.css">
     <link rel="stylesheet" href="{% static 'assets/css/vanilla-zoom.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/loading-bar.css' %}">
     <link rel="stylesheet" href="{% static 'dist/themes/toasteur-default.min.css' %}">
-	<noscript>
-		<link rel="stylesheet" type="text/css" href="{% static 'css/light.css' %}">
-	</noscript>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108356992-4"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-	  gtag('config', 'UA-108356992-4');
-	</script>
+    <noscript>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/light.css' %}">
+    </noscript>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-108356992-4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-108356992-4');
+    </script>
 </head>
 
 <body>
 <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-white clean-navbar">
-    <div class="container"><a class="navbar-brand logo" href="{% url 'welcome' %}">Plagio</a>
-        <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span
-                class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navcol-1">
-            <ul class="navbar-nav ms-auto">
-                <!--<li class="nav-item" style="text-align: center;">
-                    <label>
-                        <input type="search" style="padding: 2px 2px;padding-right: 11px;border-radius:
-                            16px;width: 299px;border-color: rgba(0,0,0,0.46);">
-                    </label>
-                    <i class="fas fa-search" style="margin: 0 5px 0 -31px;">
-
-                    </i>
-                </li>-->
-                <li class="nav-item" style="text-align: center;">
-                    <a class="nav-link {{ active_w }}" href="{% url 'welcome' %}">Home</a></li>
-                <li class="nav-item" style="text-align: center;">
-                    <a class="nav-link {{ active_f }}" href="{% url 'feature' %}">Features</a>
-                </li>
-                <li class="nav-item" style="text-align: center;">
-                    <a class="nav-link {{ active_a }}" href="{% url 'about-us' %}">About Us</a></li>
-                <li class="nav-item" style="text-align: center;">
-                    <a class="nav-link {{ active_c }}" href="{% url 'contact-us' %}">Contact Us</a></li>
-                <li class="nav-item dropdown" style="text-align: center;">
-                    <a class="dropdown-toggle nav-link" aria-expanded="false"
-                       data-bs-toggle="dropdown" href="#">More </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{% url 'upload' %}">Upload</a>
-                        <a class="dropdown-item" href="#">Uploaded</a>
-                    </div>
-                </li>
-                {% if user.is_authenticated %}
+        <div class="container"><a class="navbar-brand logo" href="{% url 'welcome' %}">Plagio</a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span
+                    class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" style="text-align: center;">
+                        <a class="nav-link {{ active_w }}" href="{% url 'welcome' %}">Home</a>
+                    </li>
+                    <li class="nav-item" style="text-align: center;">
+                        <a class="nav-link {{ active_f }}" href="{% url 'feature' %}">Features</a>
+                    </li>
+                    <li class="nav-item" style="text-align: center;">
+                        <a class="nav-link {{ active_a }}" href="{% url 'about-us' %}">About Us</a>
+                    </li>
+                    <li class="nav-item" style="text-align: center;">
+                        <a class="nav-link {{ active_c }}" href="{% url 'contact-us' %}">Contact Us</a>
+                    </li>
+                    <li class="nav-item dropdown" style="text-align: center;">
+                        <a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown"
+                            href="#">More </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'upload' %}">Upload</a>
+                            <a class="dropdown-item" href="#">Uploaded</a>
+                        </div>
+                    </li>
+                    {% if user.is_authenticated %}
                     <div class="d-none d-sm-none d-md-none d-lg-block">
                         <div class="text-capitalize dropdown" style="text-align: center;">
-                            <i class="text-success dropdown-toggle"
-                               aria-expanded="false"
-                               data-bs-toggle="dropdown">
+                            <i class="text-success dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown">
                                 {{ user.username }}
-                                <img width="38px" height="38px"
-                                     class="rounded-circle"
-                                     src="{{ user.profile.url }}"
-                                     alt=""></i>
+                                <img width="38px" height="38px" class="rounded-circle" src="{{ user.profile.url }}"
+                                    alt=""></i>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
                                 <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                             </div>
                         </div>
                     </div>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
-{% block content %}
-
-{% endblock %}
-
-<footer class="page-footer dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-3">
-                <h5>Get started</h5>
-                <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Sign up</a></li>
-                    <li><a href="#">Downloads</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-3">
-                <h5>About us</h5>
-                <ul>
-                    <li><a href="#">Company Information</a></li>
-                    <li><a href="#">Contact us</a></li>
-                    <li><a href="#">Reviews</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-3">
-                <h5>Support</h5>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Help desk</a></li>
-                    <li><a href="#">Forums</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-3">
-                <h5>Legal</h5>
-                <ul>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Terms of Use</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
-    </div>
-    <div class="footer-copyright">
-        <p>© 2022 Copyright Text</p>
-    </div>
-</footer>
-<script src="{% static 'dist/darkmode.min.js' %}"></script>
-<script>
+    </nav>
+    {% block content %}
+
+    {% endblock %}
+
+    <footer class="fixed-bottom page-footer dark d-none d-sm-none d-md-block d-xl-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h5>Get started</h5>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Sign up</a></li>
+                        <li><a href="#">Downloads</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>About us</h5>
+                    <ul>
+                        <li><a href="#">Company Information</a></li>
+                        <li><a href="#">Contact us</a></li>
+                        <li><a href="#">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Support</h5>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help desk</a></li>
+                        <li><a href="#">Forums</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Legal</h5>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <p>© 2022 Copyright Text</p>
+        </div>
+    </footer>
+    <script src="{% static 'dist/darkmode.min.js' %}"></script>
+    <script>
         var options = {
-          light: "{% static 'css/light.css' %}",
-          dark: "{% static 'css/dark.css' %},
+            light: "{% static 'css/light.css' %}",
+            dark: "{% static 'css/dark.css' %},
           startAt: "23:00",
-          endAt: "06:00",
-          checkSystemScheme: true,
-          saveOnToggle: true
+            endAt: "06:00",
+            checkSystemScheme: true,
+            saveOnToggle: true
         };
         var DarkMode = new DarkMode(options);
-</script>
-{% if messages %}
+    </script>
+    {% if messages %}
     <ul class="messages">
         {% for message in messages %}
-            {% if message.tags == 'alert-success'%}
-            <script>
-                const body = document.getElementsByTagName('body')[0];
-                body.onload = () => new Toasteur().success('{{ message }}');
-            </script>
-            {% elif message.tags == 'alert-danger' %}
-            <script>
-                const body = document.getElementsByTagName('body')[0];
-                body.onload = () => new Toasteur().error('{{ message }}');
-            </script>
-            {% elif message.tags == 'alert-warning' %}
-            <script>
-                const body = document.getElementsByTagName('body')[0];
-                body.onload = () => new Toasteur().warn('{{ message }}');
-            </script>
-            {% elif message.tags == 'alert-info' %}
-            <script>
-                const body = document.getElementsByTagName('body')[0];
-                body.onload = () => new Toasteur().info('{{ message }}');
-            </script>
-            {% endif %}
+        {% if message.tags == 'alert-success'%}
+        <script>
+            const body = document.getElementsByTagName('body')[0];
+            body.onload = () => new Toasteur().success('{{ message }}');
+        </script>
+        {% elif message.tags == 'alert-danger' %}
+        <script>
+            const body = document.getElementsByTagName('body')[0];
+            body.onload = () => new Toasteur().error('{{ message }}');
+        </script>
+        {% elif message.tags == 'alert-warning' %}
+        <script>
+            const body = document.getElementsByTagName('body')[0];
+            body.onload = () => new Toasteur().warn('{{ message }}');
+        </script>
+        {% elif message.tags == 'alert-info' %}
+        <script>
+            const body = document.getElementsByTagName('body')[0];
+            body.onload = () => new Toasteur().info('{{ message }}');
+        </script>
+        {% endif %}
         {% endfor %}
     </ul>
-{% endif %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<script src="{% static 'assets/js/vanilla-zoom.js' %}"></script>
-<script src="{% static 'dist/toasteur.min.js' %}"></script>
-<script src="{% static 'assets/js/theme.js' %}"></script>
-<script src="{% static 'js/loading-bar.js' %}"></script>
+    {% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src="{% static 'assets/js/vanilla-zoom.js' %}"></script>
+    <script src="{% static 'dist/toasteur.min.js' %}"></script>
+    <script src="{% static 'assets/js/theme.js' %}"></script>
+    <script src="{% static 'js/loading-bar.js' %}"></script>
 </body>
 
 </html>

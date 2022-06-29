@@ -1,10 +1,12 @@
 absl-py==1.1.0
 astunparse==1.6.3
+beautifulsoup4==4.11.1
 colorama==0.4.5
 django-environ==0.8.1
 django-heroku==0.3.1
 django-storages==1.12.3
 django-user-visit==0.5.1
+docx2txt==0.8
 flatbuffers==2.0
 gast==0.5.3
 google-auth-oauthlib==0.5.2
@@ -17,9 +19,12 @@ keras-preprocessing==1.1.2
 libclang==14.0.1
 markdown==3.3.7
 matplotlib==3.5.2
+nltk==3.7
 opt-einsum==3.3.0
+pip-chill==1.0.1
 psycopg2-binary==2.9.3
 pylint==2.14.1
+pypdf2==2.4.0
 sagemaker==2.96.0
 tensorflow-io-gcs-filesystem==0.26.0
 termcolor==1.1.0
