@@ -43,7 +43,8 @@ class UserRegistrationForm(UserCreationForm):
 
     class Meta:
         model = TheUsers
-        fields = ('username', 'name', 'email', 'phone', 'password1', 'password2')
+        fields = ('username', 'name', 'email',
+                  'phone', 'password1', 'password2')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control form-control-user'}),
             'name': forms.TextInput(attrs={'class': 'form-control form-control-user'}),
@@ -71,3 +72,16 @@ class UploadedDocumentsForm(forms.ModelForm):
     class Meta:
         model = UploadedDocuments
         fields = "__all__"
+        widgets = {
+            'document': forms.FileInput(
+                attrs={
+                    'class': 'drop-zone__input',
+                    'id': 'file',
+                    'accepts': 'application/pdf,\
+                    application/msword, \
+                        application/vnd.openxmlformats-officedocument\
+                            .wordprocessingml.document',
+                    'required': True,
+                }
+            ),
+        }
