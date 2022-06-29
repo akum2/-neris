@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from pyparsing import TokenConverter
+from authentication.checker import lcs
 import docx2txt
 import requests, re, math
 from django.contrib import messages, auth
@@ -168,13 +171,63 @@ def upload(request):
             output = "Input query text matches %0.02f%% with database." % match_percentage
 
             # Check for Plagiarism status
-            f = requests.get('')
-            orig=f.read().replace("\n"," ")
-            f.close()
+            f = requests.get('https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx')
+            orig=f.replace("\n"," ") # tokenizing
 
-            f2=open('hello.docx',"r")
-            plag=f2.read().replace("\n"," ")
-            f2.close()
+            f2 = tokenizer_pro
+            plag=f2.replace("\n"," ") #tokenizer
+
+            tokens_o=word_tokenize(orig)
+            tokens_p=word_tokenize(plag)
+
+            #lowerCase
+            tokens_o = [token.lower() for token in tokens_o]
+            tokens_p = [token.lower() for token in tokens_p]
+
+            #stop word removal
+            #punctuation removal
+            stop_words=set(stopwords.words('english'))
+            punctuations=['"','.','(',')',',','?',';',':',"''",'``']
+            filtered_tokens_o = [w for w in tokens_o if not w in stop_words and not w in punctuations]
+            filtered_tokens_p = [w for w in tokens_p if not w in stop_words and not w in punctuations]
+
+
+            #Trigram Similiarity measures
+            trigrams_o=[]
+            for i in range(len(tokens_o)-2):
+                t=(tokens_o[i],tokens_o[i+1],tokens_o[i+2])
+                trigrams_o.append(t)
+
+            s=0
+            trigrams_p=[]
+            for i in range(len(tokens_p)-2):
+                t=(tokens_p[i],tokens_p[i+1],tokens_p[i+2])
+                trigrams_p.append(t)
+                if t in trigrams_o:
+                    s+=1
+
+            #jaccord coefficient = (S(o)^S(p))/(S(o) U S(p))
+            J=s/(len(trigrams_o)+len(trigrams_p))
+
+            #containment measure
+            C=s/len(trigrams_p)
+
+
+            sent_o=sent_tokenize(orig)
+            sent_p=sent_tokenize(plag)
+
+            #maximum length of LCS for a sentence in suspicious text
+            max_lcs=0
+            sum_lcs=0
+
+            for i in sent_p:
+                for j in sent_o:
+                    l=lcs(i,j)
+                    max_lcs=max(max_lcs,l)
+                sum_lcs+=max_lcs
+                max_lcs=0
+
+            score=sum_lcs/len(tokens_p)
 
 
             messages.success(request, "Your query has been processed.")
