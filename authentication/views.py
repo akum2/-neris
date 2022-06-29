@@ -3,7 +3,9 @@ from datetime import datetime
 from pyparsing import TokenConverter
 from authentication.checker import lcs
 import docx2txt
-import requests, re, math
+import requests
+import re
+import math
 from django.contrib import messages, auth
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -119,7 +121,6 @@ def results(request):
     return render(request, 'homepages/results.html', context)
 
 
-
 @login_required(login_url='/signin')
 def upload(request):
     form = UploadedDocumentsForm(request.POST, request.FILES)
@@ -137,7 +138,8 @@ def upload(request):
             for word in query_word_list:
                 if word not in universal_set_of_unique_words:
                     universal_set_of_unique_words.append(word)
-            fd = requests.get("https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx")
+            fd = requests.get(
+                "https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx")
             database1 = fd.lower()
             database_word_list = re.sub("[\w]", " ", database1).split()
             for word in database_word_list:
@@ -167,75 +169,90 @@ def upload(request):
             for i in range(len(database_tf)):
                 database_vector_magnitude += database_tf[i] ** 2
             database_vector_magnitude = math.sqrt(database_vector_magnitude)
-            match_percentage = float(dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
+            match_percentage = float(
+                dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
             output = "Input query text matches %0.02f%% with database." % match_percentage
 
             # Check for Plagiarism status
-            f = requests.get('https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx')
-            orig=f.replace("\n"," ") # tokenizing
+            f = requests.get(
+                'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx')
+            orig = f.replace("\n", " ")  # tokenizing
 
             f2 = tokenizer_pro
-            plag=f2.replace("\n"," ") #tokenizer
+            plag = f2.replace("\n", " ")  # tokenizer
 
-            tokens_o=word_tokenize(orig)
-            tokens_p=word_tokenize(plag)
+            tokens_o = word_tokenize(orig)
+            tokens_p = word_tokenize(plag)
 
-            #lowerCase
+            # lowerCase
             tokens_o = [token.lower() for token in tokens_o]
             tokens_p = [token.lower() for token in tokens_p]
 
-            #stop word removal
-            #punctuation removal
-            stop_words=set(stopwords.words('english'))
-            punctuations=['"','.','(',')',',','?',';',':',"''",'``']
-            filtered_tokens_o = [w for w in tokens_o if not w in stop_words and not w in punctuations]
-            filtered_tokens_p = [w for w in tokens_p if not w in stop_words and not w in punctuations]
+            # stop word removal
+            # punctuation removal
+            stop_words = set(stopwords.words('english'))
+            punctuations = ['"', '.', '(', ')', ',', '?', ';', ':', "''", '``']
+            filtered_tokens_o = [
+                w for w in tokens_o if not w in stop_words and not w in punctuations]
+            filtered_tokens_p = [
+                w for w in tokens_p if not w in stop_words and not w in punctuations]
 
-
-            #Trigram Similiarity measures
-            trigrams_o=[]
+            # Trigram Similiarity measures
+            trigrams_o = []
             for i in range(len(tokens_o)-2):
-                t=(tokens_o[i],tokens_o[i+1],tokens_o[i+2])
+                t = (tokens_o[i], tokens_o[i+1], tokens_o[i+2])
                 trigrams_o.append(t)
 
-            s=0
-            trigrams_p=[]
+            s = 0
+            trigrams_p = []
             for i in range(len(tokens_p)-2):
-                t=(tokens_p[i],tokens_p[i+1],tokens_p[i+2])
+                t = (tokens_p[i], tokens_p[i+1], tokens_p[i+2])
                 trigrams_p.append(t)
                 if t in trigrams_o:
-                    s+=1
+                    s += 1
 
-            #jaccord coefficient = (S(o)^S(p))/(S(o) U S(p))
-            J=s/(len(trigrams_o)+len(trigrams_p))
+            # jaccord coefficient = (S(o)^S(p))/(S(o) U S(p))
+            """
+            Here, we find the number of overlapping trigrams in
+            the two texts, i.e the number of continuous sequences
+            of three words which are present in both texts.
+            """
+            J = s/(len(trigrams_o)+len(trigrams_p))
 
-            #containment measure
-            C=s/len(trigrams_p)
+            # containment measure
+            """
+            The containment measure C is a better metric for
+            or document pairs with varied document lengths.
+            Here, we normalize by the trigrams in the suspicious
+            """
+            C = s/len(trigrams_p)
 
+            sent_o = sent_tokenize(orig)
+            sent_p = sent_tokenize(plag)
 
-            sent_o=sent_tokenize(orig)
-            sent_p=sent_tokenize(plag)
-
-            #maximum length of LCS for a sentence in suspicious text
-            max_lcs=0
-            sum_lcs=0
+            # maximum length of LCS for a sentence in suspicious text
+            max_lcs = 0
+            sum_lcs = 0
 
             for i in sent_p:
                 for j in sent_o:
-                    l=lcs(i,j)
-                    max_lcs=max(max_lcs,l)
-                sum_lcs+=max_lcs
-                max_lcs=0
+                    l = lcs(i, j)
+                    max_lcs = max(max_lcs, l)
+                sum_lcs += max_lcs
+                max_lcs = 0
 
-            score=sum_lcs/len(tokens_p)
-
+            score = sum_lcs/len(tokens_p)
 
             messages.success(request, "Your query has been processed.")
-            context ={
+            context = {
                 'title': 'Upload',
                 'active_u': 'active',
                 'output': output,
                 'match_percentage': match_percentage,
+                'score': score,
+                'jaccard_coeficent': J,
+                'containment_measure': C,
+                'trigram_similarity': score,
             }
             return render(request, 'homepages/results.html', context)
     context = {
