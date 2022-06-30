@@ -77,10 +77,7 @@ class UploadedDocumentsForm(forms.ModelForm):
                 attrs={
                     'class': 'drop-zone__input',
                     'id': 'file',
-                    'accepts': 'application/pdf,\
-                    application/msword, \
-                        application/vnd.openxmlformats-officedocument\
-                            .wordprocessingml.document',
+                    'accept': '.doc, .docx, .txt',
                     'required': True,
                 }
             ),
