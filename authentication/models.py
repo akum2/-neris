@@ -91,7 +91,18 @@ class TheUsers(AbstractBaseUser):
         return self.username
 
     objects = TheUserManager()
+    
+    
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+        
+    
+    def has_module_perms(self, app_label):
+        return self.is_superuser
 
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = 'Users'
 
 """
     def save(self, *args, **kwargs):
@@ -130,24 +141,12 @@ class TheUsers(AbstractBaseUser):
 """
 
 
-def has_perm(self, perm, obj=None):
-    return self.is_superuser
-
-
-def has_module_perms(self, app_label):
-    return self.is_superuser
-
-
-class Meta:
-    verbose_name = "User"
-    verbose_name_plural = 'Users'
 
 
 class UploadedDocuments(models.Model):
     user = models.ForeignKey(
         TheUsers,
         on_delete=models.CASCADE,
-        related_name='documents'
     )
     document = models.FileField(
         verbose_name='Document',
