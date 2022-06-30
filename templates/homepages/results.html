@@ -1,3 +1,5 @@
+{% extends 'homepages/base.html' %}
+{% load static %}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
   google.charts.load("current", { packages: ["corechart"] });
@@ -29,8 +31,8 @@
   function drawChart() {
     var data = google.visualization.arrayToDataTable([
       ['Document status', 'Plagiarized status'],
-      ['Plagiarised', 11,],
-      ['Non-Plagiarised', 7]
+      ['Plagiarised', {{ match_percentage }},],
+      ['Non-Plagiarised', {{ rest_percentage }}]
     ]);
 
     var options = {
@@ -49,9 +51,9 @@
     var data = google.visualization.arrayToDataTable(
       [
         ["Element", "Density", { role: "style" }],
-        ["Copper", 8.94, "green"],
-        ["Silver", 10.49, "blue"],
-        ["Gold", 19.30, "gold"]
+        ["Jaccard Coeffient", {{ jaccard_coeficent }}, "green"],
+        ["Containmanent Measure", {{ containment_measure }}, "blue"],
+        ["Plagiarism Score", {{ score }}, "gold"]
       ]
     );
 
@@ -78,10 +80,6 @@
     chart.draw(view, options);
   }
 </script>
-
-{% extends 'homepages/base.html' %}
-
-{% load static %}
 {% block content %}
 {% if score != null %}
 <div class="w-100" style="height: 100px; display:block"></div>
