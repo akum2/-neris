@@ -1,9 +1,13 @@
 from datetime import datetime
+from urllib.error import URLError
+from django.http import HttpResponse
 
 from pyparsing import TokenConverter
+import urllib
 from authentication.checker import lcs
 import docx2txt
 import requests
+from django.urls import reverse
 import re
 import math
 from django.contrib import messages, auth
@@ -123,14 +127,24 @@ def results(request):
 
 @login_required(login_url='/signin')
 def upload(request):
-    form = UploadedDocumentsForm(request.POST, request.FILES)
     if request.POST:
-        tokenizer_pro = form.serialised_content = docx2txt.process(
-            form.document,
-            f'{MEDIA_ROOT}/docs'
-        )
+        form = UploadedDocumentsForm(request.POST, request.FILES)
+        # form['user'].value = request.user
+        # form['plagiarism_status'].value = True
+        # form['serialised_content'].value = "anything"
+        tokenizer = request.FILES['document'].read()
+        tokenizer_pro = tokenizer.decode('utf-8')
+        # tokenizer_pro = "hello"
         if form.is_valid():
-            form.save()
+            try:
+                form.save()
+                messages.success(request, 'Document uploaded successfully')
+            except ValueError as e:
+                messages.error(request, e)
+            except Exception as e:
+                messages.error(request, e)
+            except ValidationError as e:
+                messages.error(request, e)
             # For most common english words check
             universal_set_of_unique_words = []
             lowercase_query = tokenizer_pro.lower()
@@ -138,8 +152,13 @@ def upload(request):
             for word in query_word_list:
                 if word not in universal_set_of_unique_words:
                     universal_set_of_unique_words.append(word)
-            fd = requests.get(
-                "https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx")
+            try:
+                url = "https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx"
+                fd1 = urllib.request.urlopen(url)
+                fdn = fd1.read()
+                fd = fdn.decode("utf-8")
+            except URLError:
+                messages.warning(request, "Error in connecting to the server")
             database1 = fd.lower()
             database_word_list = re.sub("[\w]", " ", database1).split()
             for word in database_word_list:
@@ -169,13 +188,21 @@ def upload(request):
             for i in range(len(database_tf)):
                 database_vector_magnitude += database_tf[i] ** 2
             database_vector_magnitude = math.sqrt(database_vector_magnitude)
-            match_percentage = float(
-                dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
+            try: 
+                match_percentage = float(
+                    dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
+            except ZeroDivisionError:
+                match_percentage = 0
             output = "Input query text matches %0.02f%% with database." % match_percentage
-
             # Check for Plagiarism status
-            f = requests.get(
-                'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx')
+            try:
+                fila = urllib.request.urlopen(
+                'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx'
+            ).read()
+            except URLError:
+                messages.warning('Network issues caused an error!')
+            f = fila.decode("utf-8")
+
             orig = f.replace("\n", " ")  # tokenizing
 
             f2 = tokenizer_pro
@@ -193,9 +220,11 @@ def upload(request):
             stop_words = set(stopwords.words('english'))
             punctuations = ['"', '.', '(', ')', ',', '?', ';', ':', "''", '``']
             filtered_tokens_o = [
-                w for w in tokens_o if not w in stop_words and not w in punctuations]
+                w for w in tokens_o if not w in stop_words and not w in punctuations
+            ]
             filtered_tokens_p = [
-                w for w in tokens_p if not w in stop_words and not w in punctuations]
+                w for w in tokens_p if not w in stop_words and not w in punctuations
+            ]
 
             # Trigram Similiarity measures
             trigrams_o = []
@@ -225,7 +254,12 @@ def upload(request):
             or document pairs with varied document lengths.
             Here, we normalize by the trigrams in the suspicious
             """
-            C = s/len(trigrams_p)
+            try:
+                C = s/len(trigrams_p)
+            except ZeroDivisionError:
+                C = 0
+
+
 
             sent_o = sent_tokenize(orig)
             sent_p = sent_tokenize(plag)
@@ -240,27 +274,35 @@ def upload(request):
                     max_lcs = max(max_lcs, l)
                 sum_lcs += max_lcs
                 max_lcs = 0
+            try:
+                score = sum_lcs/len(tokens_p)
+            except ZeroDivisionError:
+                score = 0
 
-            score = sum_lcs/len(tokens_p)
-
-            messages.success(request, "Your query has been processed.")
+            messages.success(request, "Your query has been processed successfully.")
             context = {
                 'title': 'Upload',
                 'active_u': 'active',
                 'output': output,
+                'method': request.method == 'POST',
                 'match_percentage': math.ceil(match_percentage),
+                'rest_percentage': 100 - math.ceil(match_percentage),
                 'score': math.ceil(score),
                 'jaccard_coeficent': J,
                 'containment_measure': C,
                 'trigram_similarity': score,
             }
             return render(request, 'homepages/results.html', context)
-    context = {
-        'title': 'Upload',
-        'active_u': 'active',
-        'form': form,
-    }
-    return render(request, 'homepages/upload.html', context)
+        else:
+            messages.error(request, "An error occurred. Please try again.")
+    else:
+        form = UploadedDocumentsForm
+        context = {
+            'title': 'Upload',
+            'active_u': 'active',
+            'form': form,
+        }
+    return render(request, 'homepages/upload.html', { 'form': form })
 
 
 @login_required
