@@ -7,11 +7,10 @@ from urllib.error import URLError
 from django.contrib import messages, auth
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
+from nltk import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize
-from nltk.tokenize import word_tokenize
 
 from authentication.checker import lcs
 from authentication.forms import *
@@ -55,8 +54,8 @@ def signin(request):
                 password = request.POST['password']
                 user = authenticate(
                     request,
-                    username=user_name,
-                    password=password
+                    username = user_name,
+                    password = password
                 )
                 if user is not None:
                     login(request, user)
@@ -73,7 +72,7 @@ def logout(request):
     return redirect('home')
 
 
-@login_required(login_url='/signin')
+@login_required(login_url = '/signin')
 def welcome(request):
     context = {
         'title': 'Home',
@@ -82,7 +81,7 @@ def welcome(request):
     return render(request, 'homepages/index.html', context)
 
 
-@login_required(login_url='/signin')
+@login_required(login_url = '/signin')
 def feature(request):
     context = {
         'title': 'Feature',
@@ -91,9 +90,9 @@ def feature(request):
     return render(request, 'homepages/features.html', context)
 
 
-@login_required(login_url='/signin')
+@login_required(login_url = '/signin')
 def about(request):
-    user_data = TheUsers.objects.filter(is_admin=True)
+    user_data = TheUsers.objects.filter(is_admin = True)
     context = {
         'title': 'About',
         'active_a': 'active',
@@ -102,7 +101,7 @@ def about(request):
     return render(request, 'homepages/about-us.html', context)
 
 
-@login_required(login_url='/signin')
+@login_required(login_url = '/signin')
 def contact(request):
     context = {
         'title': 'Contact',
@@ -119,18 +118,16 @@ def results(request):
     return render(request, 'homepages/results.html', context)
 
 
-@login_required(login_url='/signin')
+@login_required(login_url = '/signin')
 def upload(request):
     form = UploadedDocumentsForm(request.POST, request.FILES)
     if request.POST:
         if form.is_valid():
-            form_stack = form.save(commit=False)
-            form_stack.user = request.user
-            form_stack.serialised_content = "anything"
-            form_stack.plagiarism_status = True
+            form_stack = form.save(commit = False)
+            form_stack.serialised_content = "bala"
+            form_stack.plagiarism_status = 'Hello'
             tokenizer = request.FILES['document'].read()
             tokenizer_pro = tokenizer.decode('utf-8')
-            messages.success(request, 'great')
             try:
                 form_stack.save()
                 messages.success(request, 'Document uploaded successfully')
@@ -316,16 +313,25 @@ def profile_edit(request):
         return redirect("sigin")
     if request.method == 'POST':
         form = UpdateUserForm(request.POST, request.FILES,
-                              instance=request.user)
+                              instance = request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile successfully updated")
             return redirect('profile')
     else:
-        form = UpdateUserForm(instance=request.user)
+        form = UpdateUserForm(instance = request.user)
         context = {
             'title': 'Profile Edit',
             'active': 'active',
             'form': form
         }
         return render(request, 'homepages/profile-edit.html', context)
+
+
+@login_required
+def downloadable(request):
+    records = UploadedDocuments.objects.all()
+    context = {
+        'records': records,
+    }
+    return render(request, 'homepages/uploads_reords.html', context)
