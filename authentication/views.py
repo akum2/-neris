@@ -335,5 +335,6 @@ def downloadable(request):
     records = UploadedDocuments.objects.all()
     context = {
         'records': records,
+        'title': 'Records',
     }
-    return render(request, 'homepages/uploads_reords.html', context)
+    return render(request, 'homepages/uploads_records.html', context)
