@@ -59,7 +59,7 @@
                        href="#">More </a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{% url 'upload' %}">Upload</a>
-                        <a class="dropdown-item" href="#">Uploaded</a>
+                        <a class="dropdown-item" href="{% url 'uploaded' %}">Uploaded</a>
                     </div>
                 </li>
                 {% if user.is_authenticated %}
@@ -84,7 +84,7 @@
 
 {% endblock %}
 
-<footer class="page-footer dark d-none d-sm-none d-md-block d-xl-block">
+<footer class="page-footer dark">
     <div class="container">
         <div class="row">
             <div class="col-sm-3">
@@ -92,7 +92,7 @@
                 <ul>
                     <li><a href="#">Home</a></li>
                     <li><a href="#">Sign up</a></li>
-                    <li><a href="#">Downloads</a></li>
+                    <li><a href="#">Uploaded</a></li>
                 </ul>
             </div>
             <div class="col-sm-3">
@@ -108,7 +108,6 @@
                 <ul>
                     <li><a href="#">FAQ</a></li>
                     <li><a href="#">Help desk</a></li>
-                    <li><a href="#">Forums</a></li>
                 </ul>
             </div>
             <div class="col-sm-3">
