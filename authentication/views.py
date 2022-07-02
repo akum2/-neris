@@ -1,26 +1,20 @@
+import math
+import re
+import urllib
 from datetime import datetime
 from urllib.error import URLError
-from django.http import HttpResponse
 
-from pyparsing import TokenConverter
-import urllib
-from authentication.checker import lcs
-import docx2txt
-import requests
-from django.urls import reverse
-import re
-import math
 from django.contrib import messages, auth
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.forms import ValidationError
 from django.shortcuts import redirect, render
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
+
+from authentication.checker import lcs
 from authentication.forms import *
-from plagiarism.settings import MEDIA_ROOT
 
 
 def home(request):
@@ -127,23 +121,24 @@ def results(request):
 
 @login_required(login_url='/signin')
 def upload(request):
+    form = UploadedDocumentsForm(request.POST, request.FILES)
     if request.POST:
-        form = UploadedDocumentsForm(request.POST, request.FILES)
-        # form['user'].value = request.user
-        # form['plagiarism_status'].value = True
-        # form['serialised_content'].value = "anything"
-        tokenizer = request.FILES['document'].read()
-        tokenizer_pro = tokenizer.decode('utf-8')
-        # tokenizer_pro = "hello"
         if form.is_valid():
+            form_stack = form.save(commit=False)
+            form_stack.user = request.user
+            form_stack.serialised_content = "anything"
+            form_stack.plagiarism_status = True
+            tokenizer = request.FILES['document'].read()
+            tokenizer_pro = tokenizer.decode('utf-8')
+            messages.success(request, 'great')
             try:
-                form.save()
+                form_stack.save()
                 messages.success(request, 'Document uploaded successfully')
             except ValueError as e:
                 messages.error(request, e)
-            except Exception as e:
-                messages.error(request, e)
             except ValidationError as e:
+                messages.error(request, e)
+            except Exception as e:
                 messages.error(request, e)
             # For most common english words check
             universal_set_of_unique_words = []
@@ -188,7 +183,7 @@ def upload(request):
             for i in range(len(database_tf)):
                 database_vector_magnitude += database_tf[i] ** 2
             database_vector_magnitude = math.sqrt(database_vector_magnitude)
-            try: 
+            try:
                 match_percentage = float(
                     dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
             except ZeroDivisionError:
@@ -197,10 +192,10 @@ def upload(request):
             # Check for Plagiarism status
             try:
                 fila = urllib.request.urlopen(
-                'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx'
-            ).read()
+                    'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx'
+                ).read()
             except URLError:
-                messages.warning('Network issues caused an error!')
+                messages.warning(request, 'Network issues caused an error!')
             f = fila.decode("utf-8")
 
             orig = f.replace("\n", " ")  # tokenizing
@@ -228,14 +223,14 @@ def upload(request):
 
             # Trigram Similiarity measures
             trigrams_o = []
-            for i in range(len(tokens_o)-2):
-                t = (tokens_o[i], tokens_o[i+1], tokens_o[i+2])
+            for i in range(len(tokens_o) - 2):
+                t = (tokens_o[i], tokens_o[i + 1], tokens_o[i + 2])
                 trigrams_o.append(t)
 
             s = 0
             trigrams_p = []
-            for i in range(len(tokens_p)-2):
-                t = (tokens_p[i], tokens_p[i+1], tokens_p[i+2])
+            for i in range(len(tokens_p) - 2):
+                t = (tokens_p[i], tokens_p[i + 1], tokens_p[i + 2])
                 trigrams_p.append(t)
                 if t in trigrams_o:
                     s += 1
@@ -246,7 +241,7 @@ def upload(request):
             the two texts, i.e the number of continuous sequences
             of three words which are present in both texts.
             """
-            J = s/(len(trigrams_o)+len(trigrams_p))
+            J = s / (len(trigrams_o) + len(trigrams_p))
 
             # containment measure
             """
@@ -255,11 +250,9 @@ def upload(request):
             Here, we normalize by the trigrams in the suspicious
             """
             try:
-                C = s/len(trigrams_p)
+                C = s / len(trigrams_p)
             except ZeroDivisionError:
                 C = 0
-
-
 
             sent_o = sent_tokenize(orig)
             sent_p = sent_tokenize(plag)
@@ -275,7 +268,7 @@ def upload(request):
                 sum_lcs += max_lcs
                 max_lcs = 0
             try:
-                score = sum_lcs/len(tokens_p)
+                score = sum_lcs / len(tokens_p)
             except ZeroDivisionError:
                 score = 0
 
@@ -292,17 +285,20 @@ def upload(request):
                 'containment_measure': C,
                 'trigram_similarity': score,
             }
-            return render(request, 'homepages/results.html', context)
+            return redirect('results')
         else:
+            context = {
+                'form': form
+            }
             messages.error(request, "An error occurred. Please try again.")
+            return render(request, 'homepages/upload.html', context)
     else:
-        form = UploadedDocumentsForm
         context = {
             'title': 'Upload',
             'active_u': 'active',
             'form': form,
         }
-    return render(request, 'homepages/upload.html', { 'form': form })
+        return render(request, 'homepages/upload.html', context)
 
 
 @login_required

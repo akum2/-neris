@@ -1,5 +1,3 @@
-
-
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -91,18 +89,17 @@ class TheUsers(AbstractBaseUser):
         return self.username
 
     objects = TheUserManager()
-    
-    
+
     def has_perm(self, perm, obj=None):
         return self.is_superuser
-        
-    
+
     def has_module_perms(self, app_label):
         return self.is_superuser
 
     class Meta:
         verbose_name = "User"
         verbose_name_plural = 'Users'
+
 
 """
     def save(self, *args, **kwargs):
@@ -139,8 +136,6 @@ class TheUsers(AbstractBaseUser):
             img.thumbnail((300, 300))
         img.save(self.profile.name)
 """
-
-
 
 
 class UploadedDocuments(models.Model):
