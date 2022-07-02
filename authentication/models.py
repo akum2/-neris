@@ -16,70 +16,70 @@ class TheUserManager(BaseUserManager):
             raise ValueError("Enter your correct names")
 
         user = self.model(
-            username=username,
-            email=email,
-            phone=phone,
-            name=name,
-            password=password
+            username = username,
+            email = email,
+            phone = phone,
+            name = name,
+            password = password
         )
         user.set_password(password)
-        user.save(using=self._db)
+        user.save(using = self._db)
         return user
 
     # Creating our superuser
     def create_superuser(self, username, email, phone, name, password):
         user = self.create_user(
-            username=username,
-            email=email,
-            phone=phone,
-            password=password,
-            name=name
+            username = username,
+            email = email,
+            phone = phone,
+            password = password,
+            name = name
         )
         user.is_admin = True
         user.is_superuser = True
-        user.save(using=self._db)
+        user.save(using = self._db)
         return user
 
 
 class TheUsers(AbstractBaseUser):
     username = models.CharField(
-        verbose_name='Username',
-        max_length=60,
-        unique=True
+        verbose_name = 'Username',
+        max_length = 60,
+        unique = True
     )
     email = models.EmailField(
-        verbose_name='Email Address',
-        max_length=60,
-        unique=True
+        verbose_name = 'Email Address',
+        max_length = 60,
+        unique = True
     )
     name = models.CharField(
-        verbose_name='Full Name',
-        max_length=200,
-        unique=True
+        verbose_name = 'Full Name',
+        max_length = 200,
+        unique = True
     )
     phone = models.CharField(
-        verbose_name="Phone Number",
-        max_length=20, null=True
+        verbose_name = "Phone Number",
+        max_length = 20, null = True
     )
     date_joined = models.DateTimeField(
-        verbose_name='Created On',
-        auto_now_add=True
+        verbose_name = 'Created On',
+        auto_now_add = True
     )
     profile = models.ImageField(
-        verbose_name='Picture',
-        upload_to=f'profiles/%Y/',
-        default="profiles/unknown_user.png",
-        null=True,
+        verbose_name = 'Picture',
+        upload_to = f'profiles/%Y/',
+        default = "profiles/unknown_user.png",
+        null = True,
     )
     last_login = models.DateTimeField(
-        verbose_name='Last login',
-        auto_now=True,
-        null=False
+        verbose_name = 'Last login',
+        auto_now = True,
+        null = False
     )
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default = True)
+    is_admin = models.BooleanField(default = False)
+    is_staff = models.BooleanField(default = True)
+    is_superuser = models.BooleanField(default = False)
 
     # Fields to log in to app
     USERNAME_FIELD = 'username'
@@ -141,18 +141,20 @@ class TheUsers(AbstractBaseUser):
 class UploadedDocuments(models.Model):
     user = models.ForeignKey(
         TheUsers,
-        on_delete=models.CASCADE,
+        on_delete = models.CASCADE,
     )
+    document_title = models.CharField(max_length = 30)
     document = models.FileField(
-        verbose_name='Document',
-        upload_to=f'documents/%Y/',
-        null=True,
+        verbose_name = 'Document',
+        upload_to = f'documents/%Y/',
+        null = True,
     )
-    plagiarism_status = models.CharField(max_length=100, null=True)
-    serialised_content = models.CharField(null=True, max_length=255)
+    plagiarism_status = models.BooleanField(default = False, null = True)
+    plagiarism_score = models.IntegerField(default = 0, null = True)
+    serialised_content = models.CharField(null = True, max_length = 255)
     date_uploaded = models.DateTimeField(
-        verbose_name='Uploaded On',
-        auto_now_add=True
+        verbose_name = 'Uploaded On',
+        auto_now_add = True
     )
 
     def __str__(self):
