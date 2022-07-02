@@ -59,6 +59,7 @@ def signin(request):
                 )
                 if user is not None:
                     login(request, user)
+                    messages.success(request, 'Authentication successful')
                     return redirect('welcome')
         else:
             form = UserLoginForm()
@@ -78,6 +79,7 @@ def welcome(request):
         'title': 'Home',
         'active_w': 'active'
     }
+    messages.info(request, 'Welcome to the home page, try and upload a file!')
     return render(request, 'homepages/index.html', context)
 
 
