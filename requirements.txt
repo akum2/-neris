@@ -33,3 +33,5 @@ typing-extensions==4.2.0
 tzdata==2022.1
 werkzeug==2.1.2
 white-noise==0.1.0
+
+Django~=4.0.5
