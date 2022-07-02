@@ -15,5 +15,6 @@ urlpatterns = [
     path('upload', views.upload, name = "upload"),
     path('logout', views.logout, name = "logout"),
     path('results', views.results, name = "results"),
-    path('uploaded', views.downloadable, name = 'uploaded')
+    path('uploaded', views.downloadable, name = 'uploaded'),
+    path('view_doc/<pk>', views.view_doc, name = 'view_doc')
 ]

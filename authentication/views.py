@@ -335,5 +335,17 @@ def downloadable(request):
     records = UploadedDocuments.objects.all()
     context = {
         'records': records,
+        'title': 'Records',
     }
-    return render(request, 'homepages/uploads_reords.html', context)
+    return render(request, 'homepages/uploads_records.html', context)
+
+
+@login_required
+def view_doc(request, pk):
+    view = UploadedDocuments.objects.get(id = pk)
+
+    context = {
+        'view': view,
+        'title': f'{view.document_title}',
+    }
+    return render(request, 'homepages/view_document.html', context)
