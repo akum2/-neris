@@ -35,3 +35,4 @@ werkzeug==2.1.2
 white-noise==0.1.0
 
 Django~=4.0.5
+docx2pdf~=0.1.8
