@@ -162,7 +162,7 @@
             {% elif message.tags == 'alert-info' %}
                 <script>
                     const body = document.getElementsByTagName('body')[0];
-                    body.onload = () => new Toasteur('bottom-center').info('{{ message }}');
+                    body.onload = () => new Toasteur('top-left').info('{{ message }}');
                 </script>
             {% endif %}
         {% endfor %}
