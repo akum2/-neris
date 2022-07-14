@@ -4,6 +4,9 @@ import urllib
 from datetime import datetime
 from urllib.error import URLError
 
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+import requests
 from django.contrib import messages, auth
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -14,6 +17,7 @@ from nltk.corpus import stopwords
 
 from authentication.checker import lcs
 from authentication.forms import *
+from authentication.models import DocumentDetails
 
 
 def home(request):
@@ -54,8 +58,8 @@ def signin(request):
                 password = request.POST['password']
                 user = authenticate(
                     request,
-                    username = user_name,
-                    password = password
+                    username=user_name,
+                    password=password
                 )
                 if user is not None:
                     login(request, user)
@@ -73,7 +77,7 @@ def logout(request):
     return redirect('home')
 
 
-@login_required(login_url = '/signin')
+@login_required(login_url='/signin')
 def welcome(request):
     context = {
         'title': 'Home',
@@ -83,7 +87,7 @@ def welcome(request):
     return render(request, 'homepages/index.html', context)
 
 
-@login_required(login_url = '/signin')
+@login_required(login_url='/signin')
 def feature(request):
     context = {
         'title': 'Feature',
@@ -92,9 +96,9 @@ def feature(request):
     return render(request, 'homepages/features.html', context)
 
 
-@login_required(login_url = '/signin')
+@login_required(login_url='/signin')
 def about(request):
-    user_data = TheUsers.objects.filter(is_admin = True)
+    user_data = TheUsers.objects.filter(is_admin=True)
     context = {
         'title': 'About',
         'active_a': 'active',
@@ -103,7 +107,7 @@ def about(request):
     return render(request, 'homepages/about-us.html', context)
 
 
-@login_required(login_url = '/signin')
+@login_required(login_url='/signin')
 def contact(request):
     context = {
         'title': 'Contact',
@@ -120,25 +124,15 @@ def results(request):
     return render(request, 'homepages/results.html', context)
 
 
-@login_required(login_url = '/signin')
+@login_required(login_url='/signin')
 def upload(request):
     form = UploadedDocumentsForm(request.POST, request.FILES)
     if request.POST:
         if form.is_valid():
-            form_stack = form.save(commit = False)
-            form_stack.serialised_content = "bala"
-            form_stack.plagiarism_status = 'Hello'
+            form.save()
+            form_details.save()
             tokenizer = request.FILES['document'].read()
             tokenizer_pro = tokenizer.decode('utf-8')
-            try:
-                form_stack.save()
-                messages.success(request, 'Document uploaded successfully')
-            except ValueError as e:
-                messages.error(request, e)
-            except ValidationError as e:
-                messages.error(request, e)
-            except Exception as e:
-                messages.error(request, e)
             # For most common english words check
             universal_set_of_unique_words = []
             lowercase_query = tokenizer_pro.lower()
@@ -315,13 +309,13 @@ def profile_edit(request):
         return redirect("sigin")
     if request.method == 'POST':
         form = UpdateUserForm(request.POST, request.FILES,
-                              instance = request.user)
+                              instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile successfully updated")
             return redirect('profile')
     else:
-        form = UpdateUserForm(instance = request.user)
+        form = UpdateUserForm(instance=request.user)
         context = {
             'title': 'Profile Edit',
             'active': 'active',
@@ -332,17 +326,33 @@ def profile_edit(request):
 
 @login_required
 def downloadable(request):
-    records = UploadedDocuments.objects.all()
-    context = {
-        'records': records,
-        'title': 'Records',
+    ctx = {
+        'sea': 5,
+        'title': 'Uploaded Files'
     }
-    return render(request, 'homepages/uploads_records.html', context)
+    url_parameter = request.GET.get("q")
+    if url_parameter:
+        document = UploadedDocuments.objects.filter(document_title__icontains=url_parameter)
+    else:
+        document = UploadedDocuments.objects.all()
+    ctx["document"] = document
+    does_req_accept_json = request.accepts("application/json")
+    is_ajax_request = request.headers.get("x-requested-with") == "XMLHttpRequest" and does_req_accept_json
+    if is_ajax_request:
+        html = render_to_string(
+            template_name="homepages/search_included.html",
+            context={
+                "document": document,
+            }
+        )
+        data_dict = {"html_from_view": html}
+        return JsonResponse(data=data_dict, safe=False)
+    return render(request, 'homepages/uploads_records.html', context=ctx)
 
 
 @login_required
 def view_doc(request, pk):
-    view = UploadedDocuments.objects.get(id = pk)
+    view = UploadedDocuments.objects.get(id=pk)
 
     context = {
         'view': view,
