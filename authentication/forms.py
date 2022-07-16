@@ -72,6 +72,17 @@ class UploadedDocumentsForm(forms.ModelForm):
     class Meta:
         model = UploadedDocuments
         fields = '__all__'
+        exclude = [
+            'wrong_words',
+            'difficult_words',
+            'common_words',
+            'j_coefficient',
+            'containment_measure',
+            'plagiarism_score',
+            'plagiarism_status',
+            'uploader',
+            'document_content'
+        ]
         widgets = {
             'document': forms.FileInput(
                 attrs={
@@ -81,21 +92,19 @@ class UploadedDocumentsForm(forms.ModelForm):
                     'required': True,
                 }
             ),
-            'user': forms.Select(
+            'document_title': forms.TextInput(
                 attrs={
+                    'id': 'file_name',
+                    'class': 'w-100 p-2 rounded-pill',
+                    'placeholder': 'Document Title',
+                }
+            ),
+            'author': forms.TextInput(
+                attrs={
+                    'id': 'file_name',
+                    'class': 'w-100 p-2 rounded-pill',
+                    'placeholder': 'Project author',
+                }
+            ),
 
-                }
-            ),
-            'plagiarism_status': forms.TextInput(
-                attrs={
-                    'hidden': True,
-                    'value': 'new thing',
-                }
-            ),
-            'serialised_content': forms.TextInput(
-                attrs={
-                    'hidden': True,
-                    'value': 'something',
-                }
-            )
         }
