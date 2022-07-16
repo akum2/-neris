@@ -133,8 +133,6 @@ def upload(request):
     if request.method == 'POST':
         upload_form = UploadedDocumentsForm(request.POST, request.FILES)
         if upload_form.is_valid():
-            nltk.download('punkt')
-            nltk.download('stopwords')
             url = request.FILES['document']
             read_pdf = PyPDF2.PdfFileReader(url)
             text = ""
