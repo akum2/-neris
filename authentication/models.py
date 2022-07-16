@@ -140,38 +140,22 @@ class TheUsers(AbstractBaseUser):
 
 class UploadedDocuments(models.Model):
     document_title = models.CharField(max_length=30)
-    document = models.FileField(
-        verbose_name='Document',
-        upload_to=f'documents/%Y/',
-        null=True,
-    )
-    date_uploaded = models.DateTimeField(
-        verbose_name='Uploaded On',
-        auto_now_add=True
-    )
+    author = models.CharField(max_length=60)
+    document_content = models.TextField()
+    uploader = models.ForeignKey(TheUsers, on_delete=models.CASCADE)
+    document = models.FileField(verbose_name='Document', upload_to=f'documents/%Y/')
+    plagiarism_status = models.BooleanField(default=False, null=True)
+    plagiarism_score = models.DecimalField(default=0, max_digits=5, decimal_places=3, null=True)
+    j_coefficient = models.DecimalField(default=0, max_digits=5, decimal_places=3, null=True)
+    containment_measure = models.DecimalField(default=0, max_digits=5, decimal_places=3, null=True)
+    common_words = models.DecimalField(default=0, max_digits=5, decimal_places=3, )
+    difficult_words = models.DecimalField(default=0, max_digits=5, decimal_places=3, )
+    wrong_words = models.DecimalField(default=0, max_digits=5, decimal_places=3, )
+    date_uploaded = models.DateTimeField(verbose_name='Uploaded On', auto_now_add=True, )
 
     def __str__(self):
-        return self.document.name
+        return self.document_title
 
     class Meta:
         verbose_name = "Document"
         verbose_name_plural = 'Documents'
-
-
-class DocumentDetails(models.Model):
-    document = models.ForeignKey(UploadedDocuments, on_delete=models.CASCADE)
-    author = models.ForeignKey(TheUsers, on_delete=models.CASCADE)
-    plagiarism_status = models.BooleanField(default=False, null=True)
-    plagiarism_score = models.IntegerField(default=0, null=True)
-    jaccard_coefficient = models.IntegerField(default=0, null=True)
-    c = models.IntegerField(default=0, null=True)
-    common_words = models.IntegerField(default=0)
-    difficult_words = models.IntegerField(default=0)
-    wrong_words = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.document
-
-    class Meta:
-        verbose_name = "Document Details"
-        verbose_name_plural = verbose_name
