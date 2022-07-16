@@ -1,0 +1,8 @@
+{% load static %}
+<form method="POST" action="{% url 'upload_doc' %}">
+    {% csrf_token %}
+    <input type="text" name="document_title">
+    <input type="text" name="author">
+    <textarea name="document_content" col=13 row=30></textarea>
+    <button type="submit">Upload</button>
+</form>

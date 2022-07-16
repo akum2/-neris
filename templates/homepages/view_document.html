@@ -1,0 +1,12 @@
+{% extends 'homepages/base.html' %}
+{% block content %}
+    <div class="w-100" style="height: 100px; display:block"></div>
+    {#    <div class="d-flex justify-content-center">#}
+    {#        <embed class="w-75" src="https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf"#}
+    {#               height="900px"#}
+    {#        />#}
+    {#    </div>#}
+    {#    <iframe src="{{ view.document.url }}"#}
+    {#            style="width:600px; height:500px;" frameborder="0"></iframe>#}
+    <iframe src="https://docs.google.com/gview?url={{ view.document.url }}&embedded=true"></iframe>
+{% endblock %}

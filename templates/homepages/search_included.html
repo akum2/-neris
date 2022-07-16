@@ -1,0 +1,46 @@
+{% if document %}
+    <table class="table" id="replaceable-content main_content">
+        <thead class="thead-primary">
+        <tr>
+            <th>S/N</th>
+            <th>Document Title</th>
+            <th>Date uploaded</th>
+            <th>Plagiarism Status</th>
+            <th>Document author</th>
+            <th>Download Document</th>
+            <th>View Document</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in document %}
+            <tr>
+                <th scope="row" class="scope">{{ element.id }} </th>
+                <td class="text-capitalize">{{ element.document_title }}</td>
+                <td>{{ element.date_uploaded.date }}</td>
+                <td>{{ element.plagiarism_status }}</td>
+                <td class="text-capitalize">{{ element.user }}</td>
+                <td>
+                    <a href="{{ element.document.url }}"
+                       class="btn px-3 btn-light btn-outline-success">
+                        <i class="fa fa-download mx-3"></i>
+                        Download
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-light px-3 btn-outline-danger"
+                       href="{% url 'view_doc' element.id %}">
+                        <i class="fa mx-3 fa-eye"></i> View
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="w-100 row h-100 my-auto d-inline-block">
+        <p class="h1 align-items-center text-bold text-center">
+            <i class="fa fa-exclamation-triangle text-warning mx-3"></i>
+            No documents found
+        </p>
+    </div>
+{% endif %}

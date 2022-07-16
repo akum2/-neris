@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Plagiarism</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login-full-page-bs4.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+<div class="container-fluid main-panel">
+    <div class="row">
+        <div class="col d-flex justify-content-center align-items-center">
+            <div class="login-panel"
+                 style="height: 620px;margin-top: 10%;">
+                <div class="login-user-avatar"
+                     style="background-image: url({% static 'img/user-icon.jpg' %});"></div>
+                <div class="login-form">
+                    <form method="POST" action={% url 'signup' %}>
+                        {% csrf_token %}
+                        {{ form }}
+                        <button class="btn btn-primary d-block w-100" type="submit">
+                            Signup
+                        </button>
+                        <p class="center"><a href="{% url 'signin' %}" class="mb-2 form-group">login</a></p>
+                    </form>
+                </div>
+                <div class="login-response has-error">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/login-full-page-bs4.js' %}"></script>
+<script src="{% static 'js/login-full-page-bs4-1.js' %}"></script>
+</body>
+
+</html>

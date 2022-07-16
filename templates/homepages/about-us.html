@@ -1,0 +1,43 @@
+{% extends 'homepages/base.html' %}
+{% load static %}
+{% block content %}
+
+    <main class="page">
+        <section class="clean-block about-us">
+            <div class="container">
+                <div class="block-heading">
+                    <h2 class="text-info">Our Team</h2>
+                    <p>The great minds behind <b>Plagio Cheacker</b>. Meet and discover them.</p>
+                </div>
+                <div class="row justify-content-center">
+                    {% for user in user_data %}
+                        <div class="col-sm-6 col-lg-4 offset-0">
+                            <div class="card text-center clean-card">
+                                <img class="card-img-top w-100 d-block" src="{{ user.profile.url }}">
+                                <div class="card-body info">
+                                    <h4 class="card-title text-capitalize">
+                                        {{ user.name }}
+                                    </h4>
+                                    <p class="card-text">
+                                        What ever goes wrong, we are available for you.
+                                    </p>
+                                    <div class="icons">
+                                        <a href="https://facebook.com/{{ user.username }}/" target="_blank">
+                                            <i class="icon-social-facebook"></i>
+                                        </a>
+                                        <a href="https://github.com/{{ user.username }}/" target="_blank">
+                                            <i class="icon-social-github"></i>
+                                        </a>
+                                        <a href="https://twitter.com/{{ user.username }}" target="_blank">
+                                            <i class="icon-social-twitter"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
