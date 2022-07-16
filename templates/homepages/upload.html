@@ -49,9 +49,18 @@
         }
     </style>
     <div class="w-100" style="height: 150px; display:block"></div>
-    <form action="{% url 'upload' %}" method="POST" enctype='multipart/form-data'>
+    <form action="" method="post"  enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.document_title }}
+        <div class="d-flex justify-content-center">
+            <div class="d-flex col-6 justify-content-center my-2">
+                {{ form.author }}
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="d-flex col-6 justify-content-center my-2">
+                {{ form.document_title }}
+            </div>
+        </div>
         <div class="drop-zone w-50">
         <span class="drop-zone__prompt text-center h3">
             Drops file here
