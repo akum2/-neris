@@ -4,5 +4,4 @@ from django.contrib.auth.models import Group, User
 from authentication.models import *
 
 admin.site.register(UploadedDocuments)
-admin.site.register(DocumentDetails)
 admin.site.register(TheUsers)
