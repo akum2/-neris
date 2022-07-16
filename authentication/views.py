@@ -1,23 +1,25 @@
 import math
 import re
+from collections import Counter
 import urllib
+import urllib.request
 from datetime import datetime
 from urllib.error import URLError
 
-from django.template.loader import render_to_string
-from django.http import JsonResponse
-import requests
+import nltk
+import PyPDF2
 from django.contrib import messages, auth
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from nltk import word_tokenize, sent_tokenize
+from django.template.loader import render_to_string
+from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 
 from authentication.checker import lcs
+from authentication.compartor import get_result
 from authentication.forms import *
-from authentication.models import DocumentDetails
 
 
 def home(request):
@@ -64,6 +66,7 @@ def signin(request):
                 if user is not None:
                     login(request, user)
                     messages.success(request, 'Authentication successful')
+                    messages.info(request, 'Welcome ' + user.username)
                     return redirect('welcome')
         else:
             form = UserLoginForm()
@@ -116,6 +119,7 @@ def contact(request):
     return render(request, 'homepages/contact-us.html', context)
 
 
+@login_required
 def results(request):
     context = {
         'title': 'Results',
@@ -126,29 +130,31 @@ def results(request):
 
 @login_required(login_url='/signin')
 def upload(request):
-    form = UploadedDocumentsForm(request.POST, request.FILES)
-    if request.POST:
-        if form.is_valid():
-            form.save()
-            form_details.save()
-            tokenizer = request.FILES['document'].read()
-            tokenizer_pro = tokenizer.decode('utf-8')
-            # For most common english words check
+    if request.method == 'POST':
+        upload_form = UploadedDocumentsForm(request.POST, request.FILES)
+        if upload_form.is_valid():
+            nltk.download('punkt')
+            nltk.download('stopwords')
+            url = request.FILES['document']
+            read_pdf = PyPDF2.PdfFileReader(url)
+            text = ""
+            for page in read_pdf.pages:
+                text += page.extract_text() + "\n"
+                print(text)
+            document_content = text
+            tokenizer_pro = text
             universal_set_of_unique_words = []
             lowercase_query = tokenizer_pro.lower()
-            query_word_list = re.sub("[\w]", " ", lowercase_query).split()
+            query_word_list = re.sub(r"\w", " ", lowercase_query).split()
             for word in query_word_list:
                 if word not in universal_set_of_unique_words:
                     universal_set_of_unique_words.append(word)
-            try:
-                url = "https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx"
-                fd1 = urllib.request.urlopen(url)
-                fdn = fd1.read()
-                fd = fdn.decode("utf-8")
-            except URLError:
-                messages.warning(request, "Error in connecting to the server")
+            url = "https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/most_common_words.docx"
+            fd1 = urllib.request.urlopen(url)
+            fdn = fd1.read()
+            fd = fdn.decode("utf-8")
             database1 = fd.lower()
-            database_word_list = re.sub("[\w]", " ", database1).split()
+            database_word_list = re.sub(r"\w", " ", database1).split()
             for word in database_word_list:
                 if word not in universal_set_of_unique_words:
                     universal_set_of_unique_words.append(word)
@@ -181,14 +187,10 @@ def upload(request):
                     dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
             except ZeroDivisionError:
                 match_percentage = 0
-            output = "Input query text matches %0.02f%% with database." % match_percentage
             # Check for Plagiarism status
-            try:
-                fila = urllib.request.urlopen(
-                    'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx'
-                ).read()
-            except URLError:
-                messages.warning(request, 'Network issues caused an error!')
+            fila = urllib.request.urlopen(
+                'https://plagio-store.s3.eu-west-3.amazonaws.com/dataset/sample.docx'
+            ).read()
             f = fila.decode("utf-8")
 
             orig = f.replace("\n", " ")  # tokenizing
@@ -202,19 +204,7 @@ def upload(request):
             # lowerCase
             tokens_o = [token.lower() for token in tokens_o]
             tokens_p = [token.lower() for token in tokens_p]
-
-            # stop word removal
-            # punctuation removal
-            stop_words = set(stopwords.words('english'))
-            punctuations = ['"', '.', '(', ')', ',', '?', ';', ':', "''", '``']
-            filtered_tokens_o = [
-                w for w in tokens_o if not w in stop_words and not w in punctuations
-            ]
-            filtered_tokens_p = [
-                w for w in tokens_p if not w in stop_words and not w in punctuations
-            ]
-
-            # Trigram Similiarity measures
+            # Trigram Similarity measures
             trigrams_o = []
             for i in range(len(tokens_o) - 2):
                 t = (tokens_o[i], tokens_o[i + 1], tokens_o[i + 2])
@@ -228,13 +218,13 @@ def upload(request):
                 if t in trigrams_o:
                     s += 1
 
-            # jaccord coefficient = (S(o)^S(p))/(S(o) U S(p))
+            # jaccard coefficient = (S(o)^S(p))/(S(o) U S(p))
             """
             Here, we find the number of overlapping trigrams in
             the two texts, i.e the number of continuous sequences
             of three words which are present in both texts.
             """
-            J = s / (len(trigrams_o) + len(trigrams_p))
+            jaccard = s / (len(trigrams_o) + len(trigrams_p))
 
             # containment measure
             """
@@ -243,9 +233,9 @@ def upload(request):
             Here, we normalize by the trigrams in the suspicious
             """
             try:
-                C = s / len(trigrams_p)
+                containment_measure = s / len(trigrams_p)
             except ZeroDivisionError:
-                C = 0
+                containment_measure = 0
 
             sent_o = sent_tokenize(orig)
             sent_p = sent_tokenize(plag)
@@ -264,34 +254,53 @@ def upload(request):
                 score = sum_lcs / len(tokens_p)
             except ZeroDivisionError:
                 score = 0
-
-            messages.success(request, "Your query has been processed successfully.")
-            context = {
-                'title': 'Upload',
-                'active_u': 'active',
-                'output': output,
-                'method': request.method == 'POST',
-                'match_percentage': math.ceil(match_percentage),
-                'rest_percentage': 100 - math.ceil(match_percentage),
-                'score': math.ceil(score),
-                'jaccard_coeficent': J,
-                'containment_measure': C,
-                'trigram_similarity': score,
-            }
+            eng_dict_url = "https://www.cambridgeenglish.org/images/84669-pet-vocabulary-list.pdf"
+            eng_dict = PyPDF2.PdfFileReader(eng_dict_url)
+            eng_dict_to_text = ""
+            if score > 0.1:
+                plagiarism_status = True
+            else:
+                plagiarism_status = False
+            for page in eng_dict.pages:
+                eng_dict_to_text += page.extract_text() + "\n"
+            upload_form.instance.plagiarism_status = plagiarism_status
+            upload_form.instance.j_coefficient = jaccard
+            upload_form.instance.containment_measure = containment_measure
+            upload_form.instance.common_words = 5.7
+            upload_form.instance.difficult_words = 0
+            upload_form.instance.wrong_words = 1 - (
+                0 if (get_result(eng_dict_to_text, document_content) < 0)
+                else get_result(eng_dict_to_text, document_content))
+            comparator = 1 - (
+                0 if (get_result(eng_dict_to_text, document_content) < 0)
+                else get_result(eng_dict_to_text, document_content))
+            upload_form.instance.plagiarism_score = score
+            upload_form.instance.uploader = request.user
+            upload_form.instance.document_content = document_content
+            upload_form.save()
+            messages.success(
+                request,
+                'The document was scanned successfully. Here are the plagiarism results.'
+            )
+            request.session['plagiarism_score'] = score
+            request.session['j_coefficient'] = jaccard
+            request.session['containment_measure'] = containment_measure
+            request.session['common_words'] = score
+            request.session['difficult_words'] = 0
+            request.session['wrong_words'] = comparator
+            request.session['plagiarism_status'] = plagiarism_status
             return redirect('results')
         else:
-            context = {
-                'form': form
-            }
-            messages.error(request, "An error occurred. Please try again.")
-            return render(request, 'homepages/upload.html', context)
-    else:
-        context = {
-            'title': 'Upload',
-            'active_u': 'active',
-            'form': form,
-        }
-        return render(request, 'homepages/upload.html', context)
+            messages.error(
+                request,
+                'An error occurred, you surely missed out a field'
+            )
+    upload_form = UploadedDocumentsForm()
+    context = {
+        'form': upload_form,
+        'title': 'Upload',
+    }
+    return render(request, 'homepages/upload.html', context)
 
 
 @login_required
