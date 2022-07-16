@@ -1,12 +1,25 @@
 {% extends 'homepages/base.html' %}
 {% block content %}
     <div class="w-100" style="height: 100px; display:block"></div>
-    {#    <div class="d-flex justify-content-center">#}
-    {#        <embed class="w-75" src="https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf"#}
-    {#               height="900px"#}
-    {#        />#}
-    {#    </div>#}
-    {#    <iframe src="{{ view.document.url }}"#}
-    {#            style="width:600px; height:500px;" frameborder="0"></iframe>#}
-    <iframe src="https://docs.google.com/gview?url={{ view.document.url }}&embedded=true"></iframe>
+    <div class="d-flex h-100">
+        <iframe class="w-75 h-100 float-left"
+                src="https://docs.google.com/gview?url={{ view.document.url }}&embedded=true"></iframe>
+        <div class="w-25 mx-5 h-100 float-left">
+            <p class="text-black mx-3">
+                <span>
+                    Title
+                </span>
+                <span class="h3">
+                    {{ view.document_title }}
+                </span>
+            </p>
+            <p class="mx-3">Author: {{ view.author }}</p>
+            <p class="mx-3">Uploaded By: {{ view.uploader }}</p>
+            {% if view.plagiarism_status == True %}
+                <i class="far fa-check-circleh2 text text-success"></i>
+            {% else %}
+                <i class="fas fa-times-circle h2 text text-error"></i>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

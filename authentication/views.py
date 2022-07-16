@@ -183,8 +183,7 @@ def upload(request):
                 database_vector_magnitude += database_tf[i] ** 2
             database_vector_magnitude = math.sqrt(database_vector_magnitude)
             try:
-                match_percentage = float(
-                    dot_product / (query_vector_magnitude * database_vector_magnitude)) * 100
+                match_percentage = float(dot_product / (query_vector_magnitude * database_vector_magnitude))
             except ZeroDivisionError:
                 match_percentage = 0
             # Check for Plagiarism status
@@ -266,7 +265,7 @@ def upload(request):
             upload_form.instance.plagiarism_status = plagiarism_status
             upload_form.instance.j_coefficient = jaccard
             upload_form.instance.containment_measure = containment_measure
-            upload_form.instance.common_words = 5.7
+            upload_form.instance.common_words = match_percentage
             upload_form.instance.difficult_words = 0
             upload_form.instance.wrong_words = 1 - (
                 0 if (get_result(eng_dict_to_text, document_content) < 0)
@@ -283,9 +282,10 @@ def upload(request):
                 'The document was scanned successfully. Here are the plagiarism results.'
             )
             request.session['plagiarism_score'] = score
+            request.session['non_plagiarised'] = 1 - score
             request.session['j_coefficient'] = jaccard
             request.session['containment_measure'] = containment_measure
-            request.session['common_words'] = score
+            request.session['common_words'] = match_percentage
             request.session['difficult_words'] = 0
             request.session['wrong_words'] = comparator
             request.session['plagiarism_status'] = plagiarism_status
